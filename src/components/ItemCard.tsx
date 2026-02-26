@@ -7,6 +7,13 @@ import { useComplexity } from "@/lib/complexity-context";
 
 const TAG_LIMIT = 5;
 
+/** Only show impactful callouts; hide generic "no impact" variants */
+function isActionableImpact(impact: string): boolean {
+  if (!impact) return false;
+  if (/^no (direct |immediate )?impact/i.test(impact)) return false;
+  return true;
+}
+
 /** Humanize tag for display: development_cost_charges → Development Cost Charges */
 function formatTag(tag: string): string {
   return tag
@@ -196,7 +203,7 @@ export function ItemCard({
         </div>
       )}
 
-      {item.impact?.trim() && (
+      {item.impact?.trim() && isActionableImpact(item.impact) && (
         <div className="mb-2 flex items-start gap-1.5">
           <UserIcon className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
           <p className="truncate text-sm font-medium text-[var(--accent)] sm:max-w-none sm:overflow-visible sm:whitespace-normal">

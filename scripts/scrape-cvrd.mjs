@@ -563,7 +563,10 @@ function parseCvrdAgendaHtml(html) {
       .replace(/\s+/g, " ")
       .trim();
 
-    const words = cleanTitle.split(/\s+/);
+    const leadingQuote = (cleanTitle.match(/^["\u201C\u201D]/) ?? [""])[0];
+    const stripped = cleanTitle.replace(/^["\u201C\u201D]/, "");
+
+    const words = stripped.split(/\s+/);
     const smallWords = [
       "AND",
       "OR",
@@ -575,7 +578,7 @@ function parseCvrdAgendaHtml(html) {
       "A",
       "AN",
     ];
-    const formattedTitle = words
+    const titleCased = words
       .map((word, i) => {
         if (smallWords.includes(word) && i > 0) {
           return word.toLowerCase();
@@ -586,6 +589,7 @@ function parseCvrdAgendaHtml(html) {
         return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
       })
       .join(" ");
+    const formattedTitle = leadingQuote + titleCased;
 
     const rawContent = [formattedTitle, description, recommendation]
       .filter(Boolean)
