@@ -15,32 +15,44 @@ function formatTag(tag: string): string {
 }
 
 /** Cleans raw PDF extraction artifacts from description/raw_content before display */
-function cleanContent(text: string): string {
+function cleanContent(text: string, title: string): string {
   if (!text) return "";
-  return text
+  let result = text
     .replace(
-      /\w+ \d{1,2}, \d{4},?\s*(?:Regular |Strategic )?Council (?:Meeting|Committee)\s*(?:Agenda)?Page\s*\d+/gi,
+      /\w+ \d{1,2},?\s*\d{4},?\s*(?:Regular |Strategic )?(?:Council |Planning )?(?:Meeting|Committee)\s*(?:Agenda|Meeting)?(?:\s*Page)?\s*\d*/gi,
       ""
     )
     .replace(
       /Town of Comox\s+Bylaw No\.\s*\d+\s*[–-]\s*[^\n]+Page\s*\d+/gi,
       ""
     )
-    .replace(/^[.\s]{10,}$/gm, "")
+    .replace(/^[.\s…]{10,}$/gm, "")
+    .replace(/STRATEGIC PLAN LINKAGE[\s\S]*?(?=\n\n|\n[A-Z])/gi, "")
+    .replace(/Strategic Priority\s+Areas of Focus[\s\S]*?(?=\n\n)/gi, "")
+    .replace(/Core Services\s*•[^\n]*/g, "")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+  if (title.trim()) {
+    const escapedTitle = title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    result = result.replace(
+      new RegExp(`^${escapedTitle}\\s*$`, "gmi"),
+      ""
+    ).trim();
+  }
+  return result;
 }
 
 /** Returns true if expanded content is redundant (don't show expand) */
 function isContentRedundant(
   summary: string | null,
-  expanded: string | null
+  expanded: string | null,
+  title: string
 ): boolean {
   if (!summary || !expanded) return false;
-  const cleaned = cleanContent(expanded);
+  const cleaned = cleanContent(expanded, title);
+  if (cleaned.length < 80) return true;
   const summaryLen = summary.trim().length;
   const expandedLen = cleaned.length;
-  // Hide if expanded adds little beyond summary (less than 1.5x)
   if (summaryLen > 0 && expandedLen < summaryLen * 1.5) return true;
   const normalize = (s: string) =>
     s
@@ -160,7 +172,11 @@ export function ItemCard({
 
   const displaySummary = getSummaryForComplexity(item, complexity);
   const expandedContent = item.raw_content || item.description || "";
-  const isRedundant = isContentRedundant(displaySummary, expandedContent);
+  const isRedundant = isContentRedundant(
+    displaySummary,
+    expandedContent,
+    item.title || ""
+  );
   const hasExpandableContent =
     !!expandedContent && !isRedundant;
   const hasMore =
@@ -242,7 +258,7 @@ export function ItemCard({
             Full description
           </h4>
           <div className="whitespace-pre-wrap leading-relaxed">
-            {cleanContent(expandedContent)}
+            {cleanContent(expandedContent, item.title || "")}
           </div>
         </div>
       )}
