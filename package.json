@@ -1,0 +1,44 @@
+{
+  "name": "comox-valley-council-watch",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:seed": "supabase db reset",
+    "scrape:courtenay": "node scripts/scrape-courtenay-highlights.mjs",
+    "scrape:comox": "node scripts/scrape-comox.mjs",
+    "scrape:comox:dry": "node scripts/scrape-comox.mjs --dry-run",
+    "scrape:cvrd": "node scripts/scrape-cvrd.mjs",
+    "scrape:cvrd:dry": "node scripts/scrape-cvrd.mjs --dry-run",
+    "fix:categories": "node scripts/fix-categories.mjs",
+    "test:ai": "node scripts/test-ai-pipeline.mjs",
+    "test:decision": "node scripts/test-decision-extraction.mjs",
+    "pipeline": "node scripts/run-pipeline.mjs",
+    "process:ai": "node scripts/process-ai-summaries.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.47.10",
+    "cheerio": "^1.0.0",
+    "next": "16.1.6",
+    "pdf-parse": "^1.1.1",
+    "playwright": "^1.58.2",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "tsx": "^4.19.2",
+    "typescript": "^5"
+  }
+}

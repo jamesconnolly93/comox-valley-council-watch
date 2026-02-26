@@ -1,0 +1,1005 @@
+0 verbose cli /Users/jamesconnolly/.nvm/versions/node/v22.22.0/bin/node /Users/jamesconnolly/.nvm/versions/node/v22.22.0/bin/npm
+1 info using npm@10.9.4
+2 info using node@v22.22.0
+3 silly config load:file:/Users/jamesconnolly/.nvm/versions/node/v22.22.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/jamesconnolly/Documents/comox-valley-council-watch/.npmrc
+5 silly config load:file:/Users/jamesconnolly/.npmrc
+6 silly config load:file:/Users/jamesconnolly/.nvm/versions/node/v22.22.0/etc/npmrc
+7 verbose title npm install
+8 verbose argv "install" "--cache" ".npm-cache" "--prefer-offline" "--no-audit" "--no-fund"
+9 verbose logfile logs-max:10 dir:/Users/jamesconnolly/Documents/comox-valley-council-watch/.npm-cache/_logs/2026-02-26T08_04_58_881Z-
+10 verbose logfile /Users/jamesconnolly/Documents/comox-valley-council-watch/.npm-cache/_logs/2026-02-26T08_04_58_881Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:2197815296 maxSize:549453824 maxEntrySize:274726912
+13 silly idealTree buildDeps
+14 silly fetch manifest @supabase/ssr@^0.5.2
+15 silly packumentCache full:https://registry.npmjs.org/@supabase%2fssr cache-miss
+16 http fetch GET 200 https://registry.npmjs.org/@supabase%2fssr 158ms (cache miss)
+17 silly packumentCache full:https://registry.npmjs.org/@supabase%2fssr set size:undefined disposed:false
+18 silly fetch manifest @supabase/supabase-js@^2.47.10
+19 silly packumentCache full:https://registry.npmjs.org/@supabase%2fsupabase-js cache-miss
+20 http fetch GET 200 https://registry.npmjs.org/@supabase%2fsupabase-js 108ms (cache miss)
+21 silly packumentCache full:https://registry.npmjs.org/@supabase%2fsupabase-js set size:undefined disposed:false
+22 silly fetch manifest cheerio@^1.0.0
+23 silly packumentCache full:https://registry.npmjs.org/cheerio cache-miss
+24 http fetch GET 200 https://registry.npmjs.org/cheerio 46ms (cache miss)
+25 silly packumentCache full:https://registry.npmjs.org/cheerio set size:undefined disposed:false
+26 silly fetch manifest tsx@^4.19.2
+27 silly packumentCache full:https://registry.npmjs.org/tsx cache-miss
+28 http fetch GET 200 https://registry.npmjs.org/tsx 44ms (cache miss)
+29 silly packumentCache full:https://registry.npmjs.org/tsx set size:undefined disposed:false
+30 silly placeDep ROOT @supabase/ssr@0.5.2 OK for: comox-valley-council-watch@0.1.0 want: ^0.5.2
+31 silly placeDep ROOT @supabase/supabase-js@2.97.0 OK for: @supabase/ssr@0.5.2 want: ^2.43.4
+32 silly placeDep ROOT cheerio@1.2.0 OK for: comox-valley-council-watch@0.1.0 want: ^1.0.0
+33 silly placeDep ROOT tsx@4.21.0 OK for: comox-valley-council-watch@0.1.0 want: ^4.19.2
+34 silly fetch manifest cookie@^0.7.0
+35 silly packumentCache full:https://registry.npmjs.org/cookie cache-miss
+36 silly fetch manifest @types/cookie@^0.6.0
+37 silly packumentCache full:https://registry.npmjs.org/@types%2fcookie cache-miss
+38 silly fetch manifest @supabase/auth-js@2.97.0
+39 silly packumentCache full:https://registry.npmjs.org/@supabase%2fauth-js cache-miss
+40 silly fetch manifest @supabase/storage-js@2.97.0
+41 silly packumentCache full:https://registry.npmjs.org/@supabase%2fstorage-js cache-miss
+42 silly fetch manifest @supabase/realtime-js@2.97.0
+43 silly packumentCache full:https://registry.npmjs.org/@supabase%2frealtime-js cache-miss
+44 silly fetch manifest @supabase/functions-js@2.97.0
+45 silly packumentCache full:https://registry.npmjs.org/@supabase%2ffunctions-js cache-miss
+46 silly fetch manifest @supabase/postgrest-js@2.97.0
+47 silly packumentCache full:https://registry.npmjs.org/@supabase%2fpostgrest-js cache-miss
+48 http fetch GET 200 https://registry.npmjs.org/cookie 48ms (cache miss)
+49 silly packumentCache full:https://registry.npmjs.org/cookie set size:undefined disposed:false
+50 silly fetch manifest parse5@^7.3.0
+51 silly packumentCache full:https://registry.npmjs.org/parse5 cache-miss
+52 http fetch GET 200 https://registry.npmjs.org/parse5 50ms (cache miss)
+53 silly packumentCache full:https://registry.npmjs.org/parse5 set size:undefined disposed:false
+54 silly fetch manifest undici@^7.19.0
+55 silly packumentCache full:https://registry.npmjs.org/undici cache-miss
+56 http fetch GET 200 https://registry.npmjs.org/@types%2fcookie 148ms (cache miss)
+57 silly packumentCache full:https://registry.npmjs.org/@types%2fcookie set size:undefined disposed:false
+58 silly fetch manifest domutils@^3.2.2
+59 silly packumentCache full:https://registry.npmjs.org/domutils cache-miss
+60 http fetch GET 200 https://registry.npmjs.org/undici 57ms (cache miss)
+61 silly packumentCache full:https://registry.npmjs.org/undici set size:undefined disposed:false
+62 silly fetch manifest domhandler@^5.0.3
+63 silly packumentCache full:https://registry.npmjs.org/domhandler cache-miss
+64 http fetch GET 200 https://registry.npmjs.org/@supabase%2ffunctions-js 197ms (cache miss)
+65 silly packumentCache full:https://registry.npmjs.org/@supabase%2ffunctions-js set size:undefined disposed:false
+66 silly fetch manifest htmlparser2@^10.1.0
+67 silly packumentCache full:https://registry.npmjs.org/htmlparser2 cache-miss
+68 http fetch GET 200 https://registry.npmjs.org/@supabase%2fstorage-js 203ms (cache miss)
+69 silly packumentCache full:https://registry.npmjs.org/@supabase%2fstorage-js set size:undefined disposed:false
+70 silly fetch manifest cheerio-select@^2.1.0
+71 silly packumentCache full:https://registry.npmjs.org/cheerio-select cache-miss
+72 http fetch GET 200 https://registry.npmjs.org/@supabase%2fauth-js 214ms (cache miss)
+73 silly packumentCache full:https://registry.npmjs.org/@supabase%2fauth-js set size:undefined disposed:false
+74 silly fetch manifest dom-serializer@^2.0.0
+75 silly packumentCache full:https://registry.npmjs.org/dom-serializer cache-miss
+76 http fetch GET 200 https://registry.npmjs.org/domutils 68ms (cache miss)
+77 silly packumentCache full:https://registry.npmjs.org/domutils set size:undefined disposed:false
+78 silly fetch manifest whatwg-mimetype@^4.0.0
+79 silly packumentCache full:https://registry.npmjs.org/whatwg-mimetype cache-miss
+80 http fetch GET 200 https://registry.npmjs.org/domhandler 56ms (cache miss)
+81 silly packumentCache full:https://registry.npmjs.org/domhandler set size:undefined disposed:false
+82 silly fetch manifest encoding-sniffer@^0.2.1
+83 silly packumentCache full:https://registry.npmjs.org/encoding-sniffer cache-miss
+84 http fetch GET 200 https://registry.npmjs.org/@supabase%2frealtime-js 219ms (cache miss)
+85 silly packumentCache full:https://registry.npmjs.org/@supabase%2frealtime-js set size:undefined disposed:false
+86 silly fetch manifest parse5-parser-stream@^7.1.2
+87 silly packumentCache full:https://registry.npmjs.org/parse5-parser-stream cache-miss
+88 http fetch GET 200 https://registry.npmjs.org/@supabase%2fpostgrest-js 241ms (cache miss)
+89 silly packumentCache full:https://registry.npmjs.org/@supabase%2fpostgrest-js set size:undefined disposed:false
+90 silly fetch manifest parse5-htmlparser2-tree-adapter@^7.1.0
+91 silly packumentCache full:https://registry.npmjs.org/parse5-htmlparser2-tree-adapter cache-miss
+92 http fetch GET 200 https://registry.npmjs.org/htmlparser2 50ms (cache miss)
+93 silly packumentCache full:https://registry.npmjs.org/htmlparser2 set size:undefined disposed:false
+94 silly fetch manifest esbuild@~0.27.0
+95 silly packumentCache full:https://registry.npmjs.org/esbuild cache-miss
+96 http fetch GET 200 https://registry.npmjs.org/whatwg-mimetype 41ms (cache miss)
+97 silly packumentCache full:https://registry.npmjs.org/whatwg-mimetype set size:undefined disposed:false
+98 silly fetch manifest fsevents@~2.3.3
+99 silly packumentCache full:https://registry.npmjs.org/fsevents cache-miss
+100 http fetch GET 200 https://registry.npmjs.org/cheerio-select 58ms (cache miss)
+101 silly packumentCache full:https://registry.npmjs.org/cheerio-select set size:undefined disposed:false
+102 http fetch GET 200 https://registry.npmjs.org/encoding-sniffer 47ms (cache miss)
+103 silly packumentCache full:https://registry.npmjs.org/encoding-sniffer set size:undefined disposed:false
+104 http fetch GET 200 https://registry.npmjs.org/dom-serializer 51ms (cache miss)
+105 silly packumentCache full:https://registry.npmjs.org/dom-serializer set size:undefined disposed:false
+106 http fetch GET 200 https://registry.npmjs.org/parse5-parser-stream 45ms (cache miss)
+107 silly packumentCache full:https://registry.npmjs.org/parse5-parser-stream set size:undefined disposed:false
+108 http fetch GET 200 https://registry.npmjs.org/parse5-htmlparser2-tree-adapter 48ms (cache miss)
+109 silly packumentCache full:https://registry.npmjs.org/parse5-htmlparser2-tree-adapter set size:undefined disposed:false
+110 http fetch GET 200 https://registry.npmjs.org/fsevents 48ms (cache miss)
+111 silly packumentCache full:https://registry.npmjs.org/fsevents set size:undefined disposed:false
+112 http fetch GET 200 https://registry.npmjs.org/esbuild 85ms (cache miss)
+113 silly packumentCache full:https://registry.npmjs.org/esbuild set size:undefined disposed:false
+114 silly placeDep ROOT @types/cookie@0.6.0 OK for: @supabase/ssr@0.5.2 want: ^0.6.0
+115 silly placeDep ROOT cookie@0.7.2 OK for: @supabase/ssr@0.5.2 want: ^0.7.0
+116 silly placeDep ROOT @supabase/auth-js@2.97.0 OK for: @supabase/supabase-js@2.97.0 want: 2.97.0
+117 silly placeDep ROOT @supabase/functions-js@2.97.0 OK for: @supabase/supabase-js@2.97.0 want: 2.97.0
+118 silly placeDep ROOT @supabase/postgrest-js@2.97.0 OK for: @supabase/supabase-js@2.97.0 want: 2.97.0
+119 silly placeDep ROOT @supabase/realtime-js@2.97.0 OK for: @supabase/supabase-js@2.97.0 want: 2.97.0
+120 silly placeDep ROOT @supabase/storage-js@2.97.0 OK for: @supabase/supabase-js@2.97.0 want: 2.97.0
+121 silly fetch manifest ws@^8.18.2
+122 silly packumentCache full:https://registry.npmjs.org/ws cache-miss
+123 silly fetch manifest @types/ws@^8.18.1
+124 silly packumentCache full:https://registry.npmjs.org/@types%2fws cache-miss
+125 silly fetch manifest @types/phoenix@^1.6.6
+126 silly packumentCache full:https://registry.npmjs.org/@types%2fphoenix cache-miss
+127 silly fetch manifest iceberg-js@^0.8.1
+128 silly packumentCache full:https://registry.npmjs.org/iceberg-js cache-miss
+129 http fetch GET 200 https://registry.npmjs.org/@types%2fws 47ms (cache miss)
+130 silly packumentCache full:https://registry.npmjs.org/@types%2fws set size:undefined disposed:false
+131 http fetch GET 200 https://registry.npmjs.org/ws 49ms (cache miss)
+132 silly packumentCache full:https://registry.npmjs.org/ws set size:undefined disposed:false
+133 http fetch GET 200 https://registry.npmjs.org/@types%2fphoenix 56ms (cache miss)
+134 silly packumentCache full:https://registry.npmjs.org/@types%2fphoenix set size:undefined disposed:false
+135 http fetch GET 200 https://registry.npmjs.org/iceberg-js 56ms (cache miss)
+136 silly packumentCache full:https://registry.npmjs.org/iceberg-js set size:undefined disposed:false
+137 silly fetch manifest bufferutil@^4.0.1
+138 silly packumentCache full:https://registry.npmjs.org/bufferutil cache-miss
+139 http fetch GET 200 https://registry.npmjs.org/bufferutil 42ms (cache miss)
+140 silly packumentCache full:https://registry.npmjs.org/bufferutil set size:undefined disposed:false
+141 silly fetch manifest utf-8-validate@>=5.0.2
+142 silly packumentCache full:https://registry.npmjs.org/utf-8-validate cache-miss
+143 http fetch GET 200 https://registry.npmjs.org/utf-8-validate 42ms (cache miss)
+144 silly packumentCache full:https://registry.npmjs.org/utf-8-validate set size:undefined disposed:false
+145 silly placeDep ROOT @types/phoenix@1.6.7 OK for: @supabase/realtime-js@2.97.0 want: ^1.6.6
+146 silly placeDep ROOT @types/ws@8.18.1 OK for: @supabase/realtime-js@2.97.0 want: ^8.18.1
+147 silly placeDep ROOT ws@8.19.0 OK for: @supabase/realtime-js@2.97.0 want: ^8.18.2
+148 silly placeDep ROOT iceberg-js@0.8.1 OK for: @supabase/storage-js@2.97.0 want: ^0.8.1
+149 silly placeDep ROOT cheerio-select@2.1.0 OK for: cheerio@1.2.0 want: ^2.1.0
+150 silly placeDep ROOT dom-serializer@2.0.0 OK for: cheerio@1.2.0 want: ^2.0.0
+151 silly placeDep ROOT domhandler@5.0.3 OK for: cheerio@1.2.0 want: ^5.0.3
+152 silly placeDep ROOT domutils@3.2.2 OK for: cheerio@1.2.0 want: ^3.2.2
+153 silly placeDep ROOT encoding-sniffer@0.2.1 OK for: cheerio@1.2.0 want: ^0.2.1
+154 silly placeDep ROOT htmlparser2@10.1.0 OK for: cheerio@1.2.0 want: ^10.1.0
+155 silly placeDep ROOT parse5@7.3.0 OK for: cheerio@1.2.0 want: ^7.3.0
+156 silly placeDep ROOT parse5-htmlparser2-tree-adapter@7.1.0 OK for: cheerio@1.2.0 want: ^7.1.0
+157 silly placeDep ROOT parse5-parser-stream@7.1.2 OK for: cheerio@1.2.0 want: ^7.1.2
+158 silly placeDep ROOT undici@7.22.0 OK for: cheerio@1.2.0 want: ^7.19.0
+159 silly placeDep ROOT whatwg-mimetype@4.0.0 OK for: cheerio@1.2.0 want: ^4.0.0
+160 silly fetch manifest boolbase@^1.0.0
+161 silly packumentCache full:https://registry.npmjs.org/boolbase cache-miss
+162 silly fetch manifest css-what@^6.1.0
+163 silly packumentCache full:https://registry.npmjs.org/css-what cache-miss
+164 silly fetch manifest domutils@^3.0.1
+165 silly packumentCache full:https://registry.npmjs.org/domutils cache-miss
+166 silly fetch manifest css-select@^5.1.0
+167 silly packumentCache full:https://registry.npmjs.org/css-select cache-miss
+168 silly fetch manifest domelementtype@^2.3.0
+169 silly packumentCache full:https://registry.npmjs.org/domelementtype cache-miss
+170 silly fetch manifest entities@^4.2.0
+171 silly packumentCache full:https://registry.npmjs.org/entities cache-miss
+172 silly fetch manifest domhandler@^5.0.2
+173 silly packumentCache full:https://registry.npmjs.org/domhandler cache-miss
+174 http cache https://registry.npmjs.org/domhandler 5ms (cache hit)
+175 silly packumentCache full:https://registry.npmjs.org/domhandler set size:73300 disposed:false
+176 silly fetch manifest domelementtype@^2.3.0
+177 silly packumentCache full:https://registry.npmjs.org/domelementtype cache-miss
+178 http cache https://registry.npmjs.org/domutils 7ms (cache hit)
+179 silly packumentCache full:https://registry.npmjs.org/domutils set size:102772 disposed:false
+180 silly fetch manifest domelementtype@^2.3.0
+181 silly packumentCache full:https://registry.npmjs.org/domelementtype cache-miss
+182 http fetch GET 200 https://registry.npmjs.org/domelementtype 42ms (cache miss)
+183 silly packumentCache full:https://registry.npmjs.org/domelementtype set size:undefined disposed:false
+184 silly fetch manifest iconv-lite@^0.6.3
+185 silly packumentCache full:https://registry.npmjs.org/iconv-lite cache-miss
+186 http fetch GET 200 https://registry.npmjs.org/boolbase 44ms (cache miss)
+187 silly packumentCache full:https://registry.npmjs.org/boolbase set size:undefined disposed:false
+188 silly fetch manifest whatwg-encoding@^3.1.1
+189 silly packumentCache full:https://registry.npmjs.org/whatwg-encoding cache-miss
+190 http fetch GET 200 https://registry.npmjs.org/domelementtype 41ms (cache miss)
+191 silly packumentCache full:https://registry.npmjs.org/domelementtype set size:undefined disposed:false
+192 silly fetch manifest entities@^7.0.1
+193 silly packumentCache full:https://registry.npmjs.org/entities cache-miss
+194 http fetch GET 200 https://registry.npmjs.org/css-what 50ms (cache miss)
+195 silly packumentCache full:https://registry.npmjs.org/css-what set size:undefined disposed:false
+196 silly fetch manifest entities@^6.0.0
+197 silly packumentCache full:https://registry.npmjs.org/entities cache-miss
+198 http fetch GET 200 https://registry.npmjs.org/entities 52ms (cache miss)
+199 silly packumentCache full:https://registry.npmjs.org/entities set size:undefined disposed:false
+200 http cache https://registry.npmjs.org/entities 4ms (cache hit)
+201 silly packumentCache full:https://registry.npmjs.org/entities set size:99036 disposed:false
+202 http fetch GET 200 https://registry.npmjs.org/domelementtype 48ms (cache miss)
+203 silly packumentCache full:https://registry.npmjs.org/domelementtype set size:undefined disposed:false
+204 http fetch GET 200 https://registry.npmjs.org/css-select 57ms (cache miss)
+205 silly packumentCache full:https://registry.npmjs.org/css-select set size:undefined disposed:false
+206 http fetch GET 200 https://registry.npmjs.org/whatwg-encoding 45ms (cache miss)
+207 silly packumentCache full:https://registry.npmjs.org/whatwg-encoding set size:undefined disposed:false
+208 http fetch GET 200 https://registry.npmjs.org/iconv-lite 49ms (cache miss)
+209 silly packumentCache full:https://registry.npmjs.org/iconv-lite set size:undefined disposed:false
+210 http fetch GET 200 https://registry.npmjs.org/entities 62ms (cache miss)
+211 silly packumentCache full:https://registry.npmjs.org/entities set size:undefined disposed:false
+212 silly packumentCache full:https://registry.npmjs.org/entities dispose
+213 silly placeDep ROOT boolbase@1.0.0 OK for: cheerio-select@2.1.0 want: ^1.0.0
+214 silly placeDep ROOT css-select@5.2.2 OK for: cheerio-select@2.1.0 want: ^5.1.0
+215 silly placeDep ROOT css-what@6.2.2 OK for: cheerio-select@2.1.0 want: ^6.1.0
+216 silly placeDep ROOT domelementtype@2.3.0 OK for: cheerio-select@2.1.0 want: ^2.3.0
+217 silly fetch manifest nth-check@^2.0.1
+218 silly packumentCache full:https://registry.npmjs.org/nth-check cache-miss
+219 http fetch GET 200 https://registry.npmjs.org/nth-check 51ms (cache miss)
+220 silly packumentCache full:https://registry.npmjs.org/nth-check set size:undefined disposed:false
+221 silly placeDep ROOT nth-check@2.1.1 OK for: css-select@5.2.2 want: ^2.0.1
+222 silly placeDep ROOT entities@4.5.0 OK for: dom-serializer@2.0.0 want: ^4.2.0
+223 silly placeDep ROOT iconv-lite@0.6.3 OK for: encoding-sniffer@0.2.1 want: ^0.6.3
+224 silly placeDep ROOT whatwg-encoding@3.1.1 OK for: encoding-sniffer@0.2.1 want: ^3.1.1
+225 silly fetch manifest safer-buffer@>= 2.1.2 < 3.0.0
+226 silly packumentCache full:https://registry.npmjs.org/safer-buffer cache-miss
+227 http fetch GET 200 https://registry.npmjs.org/safer-buffer 43ms (cache miss)
+228 silly packumentCache full:https://registry.npmjs.org/safer-buffer set size:undefined disposed:false
+229 silly placeDep node_modules/htmlparser2 entities@7.0.1 OK for: htmlparser2@10.1.0 want: ^7.0.1
+230 silly placeDep ROOT safer-buffer@2.1.2 OK for: iconv-lite@0.6.3 want: >= 2.1.2 < 3.0.0
+231 silly placeDep node_modules/parse5 entities@6.0.1 OK for: parse5@7.3.0 want: ^6.0.0
+232 silly placeDep ROOT esbuild@0.27.3 OK for: tsx@4.21.0 want: ~0.27.0
+233 silly placeDep ROOT fsevents@2.3.3 OK for: tsx@4.21.0 want: ~2.3.3
+234 silly fetch manifest @esbuild/aix-ppc64@0.27.3
+235 silly packumentCache full:https://registry.npmjs.org/@esbuild%2faix-ppc64 cache-miss
+236 silly fetch manifest @esbuild/android-arm@0.27.3
+237 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-arm cache-miss
+238 silly fetch manifest @esbuild/android-arm64@0.27.3
+239 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-arm64 cache-miss
+240 silly fetch manifest @esbuild/android-x64@0.27.3
+241 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-x64 cache-miss
+242 silly fetch manifest @esbuild/darwin-arm64@0.27.3
+243 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fdarwin-arm64 cache-miss
+244 silly fetch manifest @esbuild/darwin-x64@0.27.3
+245 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fdarwin-x64 cache-miss
+246 silly fetch manifest @esbuild/freebsd-arm64@0.27.3
+247 silly packumentCache full:https://registry.npmjs.org/@esbuild%2ffreebsd-arm64 cache-miss
+248 http fetch GET 200 https://registry.npmjs.org/@esbuild%2faix-ppc64 61ms (cache miss)
+249 silly packumentCache full:https://registry.npmjs.org/@esbuild%2faix-ppc64 set size:undefined disposed:false
+250 silly fetch manifest @esbuild/freebsd-x64@0.27.3
+251 silly packumentCache full:https://registry.npmjs.org/@esbuild%2ffreebsd-x64 cache-miss
+252 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fandroid-arm64 62ms (cache miss)
+253 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-arm64 set size:undefined disposed:false
+254 silly fetch manifest @esbuild/linux-arm@0.27.3
+255 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-arm cache-miss
+256 http fetch GET 200 https://registry.npmjs.org/@esbuild%2ffreebsd-arm64 64ms (cache miss)
+257 silly packumentCache full:https://registry.npmjs.org/@esbuild%2ffreebsd-arm64 set size:undefined disposed:false
+258 silly fetch manifest @esbuild/linux-arm64@0.27.3
+259 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-arm64 cache-miss
+260 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fdarwin-x64 68ms (cache miss)
+261 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fdarwin-x64 set size:undefined disposed:false
+262 silly fetch manifest @esbuild/linux-ia32@0.27.3
+263 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-ia32 cache-miss
+264 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fandroid-x64 74ms (cache miss)
+265 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-x64 set size:undefined disposed:false
+266 silly fetch manifest @esbuild/linux-loong64@0.27.3
+267 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-loong64 cache-miss
+268 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fdarwin-arm64 78ms (cache miss)
+269 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fdarwin-arm64 set size:undefined disposed:false
+270 silly fetch manifest @esbuild/linux-mips64el@0.27.3
+271 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-mips64el cache-miss
+272 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fandroid-arm 79ms (cache miss)
+273 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-arm set size:undefined disposed:false
+274 silly fetch manifest @esbuild/linux-ppc64@0.27.3
+275 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-ppc64 cache-miss
+276 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-arm 56ms (cache miss)
+277 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-arm set size:undefined disposed:false
+278 silly fetch manifest @esbuild/linux-riscv64@0.27.3
+279 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-riscv64 cache-miss
+280 http fetch GET 200 https://registry.npmjs.org/@esbuild%2ffreebsd-x64 64ms (cache miss)
+281 silly packumentCache full:https://registry.npmjs.org/@esbuild%2ffreebsd-x64 set size:undefined disposed:false
+282 silly fetch manifest @esbuild/linux-s390x@0.27.3
+283 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-s390x cache-miss
+284 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-ia32 58ms (cache miss)
+285 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-ia32 set size:undefined disposed:false
+286 silly fetch manifest @esbuild/linux-x64@0.27.3
+287 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-x64 cache-miss
+288 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-loong64 58ms (cache miss)
+289 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-loong64 set size:undefined disposed:false
+290 silly fetch manifest @esbuild/netbsd-arm64@0.27.3
+291 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fnetbsd-arm64 cache-miss
+292 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-arm64 68ms (cache miss)
+293 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-arm64 set size:undefined disposed:false
+294 silly fetch manifest @esbuild/netbsd-x64@0.27.3
+295 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fnetbsd-x64 cache-miss
+296 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-ppc64 59ms (cache miss)
+297 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-ppc64 set size:undefined disposed:false
+298 silly fetch manifest @esbuild/openbsd-arm64@0.27.3
+299 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fopenbsd-arm64 cache-miss
+300 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-mips64el 61ms (cache miss)
+301 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-mips64el set size:undefined disposed:false
+302 silly fetch manifest @esbuild/openbsd-x64@0.27.3
+303 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fopenbsd-x64 cache-miss
+304 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-s390x 58ms (cache miss)
+305 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-s390x set size:undefined disposed:false
+306 silly fetch manifest @esbuild/openharmony-arm64@0.27.3
+307 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fopenharmony-arm64 cache-miss
+308 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-riscv64 65ms (cache miss)
+309 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-riscv64 set size:undefined disposed:false
+310 silly fetch manifest @esbuild/sunos-x64@0.27.3
+311 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fsunos-x64 cache-miss
+312 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fnetbsd-arm64 54ms (cache miss)
+313 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fnetbsd-arm64 set size:undefined disposed:false
+314 silly fetch manifest @esbuild/win32-arm64@0.27.3
+315 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-arm64 cache-miss
+316 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fopenbsd-arm64 55ms (cache miss)
+317 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fopenbsd-arm64 set size:undefined disposed:false
+318 silly fetch manifest @esbuild/win32-ia32@0.27.3
+319 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-ia32 cache-miss
+320 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-x64 69ms (cache miss)
+321 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-x64 set size:undefined disposed:false
+322 silly fetch manifest @esbuild/win32-x64@0.27.3
+323 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-x64 cache-miss
+324 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fopenbsd-x64 58ms (cache miss)
+325 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fopenbsd-x64 set size:undefined disposed:false
+326 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fnetbsd-x64 67ms (cache miss)
+327 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fnetbsd-x64 set size:undefined disposed:false
+328 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fopenharmony-arm64 50ms (cache miss)
+329 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fopenharmony-arm64 set size:undefined disposed:false
+330 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fsunos-x64 50ms (cache miss)
+331 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fsunos-x64 set size:undefined disposed:false
+332 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fwin32-arm64 55ms (cache miss)
+333 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-arm64 set size:undefined disposed:false
+334 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fwin32-ia32 60ms (cache miss)
+335 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-ia32 set size:undefined disposed:false
+336 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fwin32-x64 139ms (cache miss)
+337 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-x64 set size:undefined disposed:false
+338 silly placeDep ROOT @esbuild/aix-ppc64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+339 silly placeDep ROOT @esbuild/android-arm@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+340 silly placeDep ROOT @esbuild/android-arm64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+341 silly placeDep ROOT @esbuild/android-x64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+342 silly placeDep ROOT @esbuild/darwin-arm64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+343 silly placeDep ROOT @esbuild/darwin-x64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+344 silly placeDep ROOT @esbuild/freebsd-arm64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+345 silly placeDep ROOT @esbuild/freebsd-x64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+346 silly placeDep ROOT @esbuild/linux-arm@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+347 silly placeDep ROOT @esbuild/linux-arm64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+348 silly placeDep ROOT @esbuild/linux-ia32@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+349 silly placeDep ROOT @esbuild/linux-loong64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+350 silly placeDep ROOT @esbuild/linux-mips64el@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+351 silly placeDep ROOT @esbuild/linux-ppc64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+352 silly placeDep ROOT @esbuild/linux-riscv64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+353 silly placeDep ROOT @esbuild/linux-s390x@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+354 silly placeDep ROOT @esbuild/linux-x64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+355 silly placeDep ROOT @esbuild/netbsd-arm64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+356 silly placeDep ROOT @esbuild/netbsd-x64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+357 silly placeDep ROOT @esbuild/openbsd-arm64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+358 silly placeDep ROOT @esbuild/openbsd-x64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+359 silly placeDep ROOT @esbuild/openharmony-arm64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+360 silly placeDep ROOT @esbuild/sunos-x64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+361 silly placeDep ROOT @esbuild/win32-arm64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+362 silly placeDep ROOT @esbuild/win32-ia32@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+363 silly placeDep ROOT @esbuild/win32-x64@0.27.3 OK for: esbuild@0.27.3 want: 0.27.3
+364 silly reify moves {}
+365 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-wasm32-wasi
+366 silly reify mark deleted [
+366 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-wasm32-wasi'
+366 silly reify ]
+367 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/win32-x64
+368 silly reify mark deleted [
+368 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/win32-x64'
+368 silly reify ]
+369 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/win32-ia32
+370 silly reify mark deleted [
+370 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/win32-ia32'
+370 silly reify ]
+371 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/win32-arm64
+372 silly reify mark deleted [
+372 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/win32-arm64'
+372 silly reify ]
+373 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/sunos-x64
+374 silly reify mark deleted [
+374 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/sunos-x64'
+374 silly reify ]
+375 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/openharmony-arm64
+376 silly reify mark deleted [
+376 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/openharmony-arm64'
+376 silly reify ]
+377 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/openbsd-x64
+378 silly reify mark deleted [
+378 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/openbsd-x64'
+378 silly reify ]
+379 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/openbsd-arm64
+380 silly reify mark deleted [
+380 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/openbsd-arm64'
+380 silly reify ]
+381 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/netbsd-x64
+382 silly reify mark deleted [
+382 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/netbsd-x64'
+382 silly reify ]
+383 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/netbsd-arm64
+384 silly reify mark deleted [
+384 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/netbsd-arm64'
+384 silly reify ]
+385 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-x64
+386 silly reify mark deleted [
+386 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-x64'
+386 silly reify ]
+387 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-s390x
+388 silly reify mark deleted [
+388 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-s390x'
+388 silly reify ]
+389 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-riscv64
+390 silly reify mark deleted [
+390 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-riscv64'
+390 silly reify ]
+391 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-ppc64
+392 silly reify mark deleted [
+392 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-ppc64'
+392 silly reify ]
+393 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-mips64el
+394 silly reify mark deleted [
+394 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-mips64el'
+394 silly reify ]
+395 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-loong64
+396 silly reify mark deleted [
+396 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-loong64'
+396 silly reify ]
+397 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-ia32
+398 silly reify mark deleted [
+398 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-ia32'
+398 silly reify ]
+399 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-arm64
+400 silly reify mark deleted [
+400 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-arm64'
+400 silly reify ]
+401 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-arm
+402 silly reify mark deleted [
+402 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/linux-arm'
+402 silly reify ]
+403 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/freebsd-x64
+404 silly reify mark deleted [
+404 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/freebsd-x64'
+404 silly reify ]
+405 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/freebsd-arm64
+406 silly reify mark deleted [
+406 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/freebsd-arm64'
+406 silly reify ]
+407 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/darwin-x64
+408 silly reify mark deleted [
+408 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/darwin-x64'
+408 silly reify ]
+409 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/android-x64
+410 silly reify mark deleted [
+410 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/android-x64'
+410 silly reify ]
+411 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/android-arm64
+412 silly reify mark deleted [
+412 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/android-arm64'
+412 silly reify ]
+413 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/android-arm
+414 silly reify mark deleted [
+414 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/android-arm'
+414 silly reify ]
+415 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/aix-ppc64
+416 silly reify mark deleted [
+416 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@esbuild/aix-ppc64'
+416 silly reify ]
+417 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-win32-x64-msvc
+418 silly reify mark deleted [
+418 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-win32-x64-msvc'
+418 silly reify ]
+419 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-win32-arm64-msvc
+420 silly reify mark deleted [
+420 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-win32-arm64-msvc'
+420 silly reify ]
+421 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-linux-x64-musl
+422 silly reify mark deleted [
+422 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-linux-x64-musl'
+422 silly reify ]
+423 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-linux-x64-gnu
+424 silly reify mark deleted [
+424 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-linux-x64-gnu'
+424 silly reify ]
+425 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-linux-arm64-musl
+426 silly reify mark deleted [
+426 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-linux-arm64-musl'
+426 silly reify ]
+427 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-linux-arm64-gnu
+428 silly reify mark deleted [
+428 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-linux-arm64-gnu'
+428 silly reify ]
+429 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-linux-arm-gnueabihf
+430 silly reify mark deleted [
+430 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-linux-arm-gnueabihf'
+430 silly reify ]
+431 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-freebsd-x64
+432 silly reify mark deleted [
+432 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-freebsd-x64'
+432 silly reify ]
+433 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-darwin-x64
+434 silly reify mark deleted [
+434 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-darwin-x64'
+434 silly reify ]
+435 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-android-arm64
+436 silly reify mark deleted [
+436 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/lightningcss-android-arm64'
+436 silly reify ]
+437 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-win32-x64-msvc
+438 silly reify mark deleted [
+438 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-win32-x64-msvc'
+438 silly reify ]
+439 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-win32-ia32-msvc
+440 silly reify mark deleted [
+440 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-win32-ia32-msvc'
+440 silly reify ]
+441 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-win32-arm64-msvc
+442 silly reify mark deleted [
+442 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-win32-arm64-msvc'
+442 silly reify ]
+443 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-wasm32-wasi
+444 silly reify mark deleted [
+444 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-wasm32-wasi'
+444 silly reify ]
+445 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-x64-musl
+446 silly reify mark deleted [
+446 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-x64-musl'
+446 silly reify ]
+447 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-x64-gnu
+448 silly reify mark deleted [
+448 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-x64-gnu'
+448 silly reify ]
+449 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-s390x-gnu
+450 silly reify mark deleted [
+450 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-s390x-gnu'
+450 silly reify ]
+451 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-riscv64-musl
+452 silly reify mark deleted [
+452 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-riscv64-musl'
+452 silly reify ]
+453 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-riscv64-gnu
+454 silly reify mark deleted [
+454 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-riscv64-gnu'
+454 silly reify ]
+455 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-ppc64-gnu
+456 silly reify mark deleted [
+456 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-ppc64-gnu'
+456 silly reify ]
+457 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-arm64-musl
+458 silly reify mark deleted [
+458 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-arm64-musl'
+458 silly reify ]
+459 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-arm64-gnu
+460 silly reify mark deleted [
+460 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-arm64-gnu'
+460 silly reify ]
+461 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-arm-musleabihf
+462 silly reify mark deleted [
+462 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-arm-musleabihf'
+462 silly reify ]
+463 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-arm-gnueabihf
+464 silly reify mark deleted [
+464 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-linux-arm-gnueabihf'
+464 silly reify ]
+465 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-freebsd-x64
+466 silly reify mark deleted [
+466 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-freebsd-x64'
+466 silly reify ]
+467 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-darwin-x64
+468 silly reify mark deleted [
+468 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-darwin-x64'
+468 silly reify ]
+469 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-android-arm64
+470 silly reify mark deleted [
+470 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-android-arm64'
+470 silly reify ]
+471 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-android-arm-eabi
+472 silly reify mark deleted [
+472 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@unrs/resolver-binding-android-arm-eabi'
+472 silly reify ]
+473 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-win32-x64-msvc
+474 silly reify mark deleted [
+474 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-win32-x64-msvc'
+474 silly reify ]
+475 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-win32-arm64-msvc
+476 silly reify mark deleted [
+476 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-win32-arm64-msvc'
+476 silly reify ]
+477 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-linux-x64-musl
+478 silly reify mark deleted [
+478 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-linux-x64-musl'
+478 silly reify ]
+479 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-linux-x64-gnu
+480 silly reify mark deleted [
+480 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-linux-x64-gnu'
+480 silly reify ]
+481 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-linux-arm64-musl
+482 silly reify mark deleted [
+482 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-linux-arm64-musl'
+482 silly reify ]
+483 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-linux-arm64-gnu
+484 silly reify mark deleted [
+484 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-linux-arm64-gnu'
+484 silly reify ]
+485 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-linux-arm-gnueabihf
+486 silly reify mark deleted [
+486 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-linux-arm-gnueabihf'
+486 silly reify ]
+487 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-freebsd-x64
+488 silly reify mark deleted [
+488 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-freebsd-x64'
+488 silly reify ]
+489 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-darwin-x64
+490 silly reify mark deleted [
+490 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-darwin-x64'
+490 silly reify ]
+491 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-android-arm64
+492 silly reify mark deleted [
+492 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@tailwindcss/oxide-android-arm64'
+492 silly reify ]
+493 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@next/swc-win32-x64-msvc
+494 silly reify mark deleted [
+494 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@next/swc-win32-x64-msvc'
+494 silly reify ]
+495 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@next/swc-win32-arm64-msvc
+496 silly reify mark deleted [
+496 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@next/swc-win32-arm64-msvc'
+496 silly reify ]
+497 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@next/swc-linux-x64-musl
+498 silly reify mark deleted [
+498 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@next/swc-linux-x64-musl'
+498 silly reify ]
+499 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@next/swc-linux-x64-gnu
+500 silly reify mark deleted [
+500 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@next/swc-linux-x64-gnu'
+500 silly reify ]
+501 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@next/swc-linux-arm64-musl
+502 silly reify mark deleted [
+502 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@next/swc-linux-arm64-musl'
+502 silly reify ]
+503 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@next/swc-linux-arm64-gnu
+504 silly reify mark deleted [
+504 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@next/swc-linux-arm64-gnu'
+504 silly reify ]
+505 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@next/swc-darwin-x64
+506 silly reify mark deleted [
+506 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@next/swc-darwin-x64'
+506 silly reify ]
+507 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-win32-x64
+508 silly reify mark deleted [
+508 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-win32-x64'
+508 silly reify ]
+509 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-win32-ia32
+510 silly reify mark deleted [
+510 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-win32-ia32'
+510 silly reify ]
+511 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-win32-arm64
+512 silly reify mark deleted [
+512 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-win32-arm64'
+512 silly reify ]
+513 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-wasm32
+514 silly reify mark deleted [
+514 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-wasm32'
+514 silly reify ]
+515 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-linuxmusl-x64
+516 silly reify mark deleted [
+516 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-linuxmusl-x64'
+516 silly reify ]
+517 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-linuxmusl-arm64
+518 silly reify mark deleted [
+518 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-linuxmusl-arm64'
+518 silly reify ]
+519 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-linux-x64
+520 silly reify mark deleted [
+520 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-linux-x64'
+520 silly reify ]
+521 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-linux-s390x
+522 silly reify mark deleted [
+522 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-linux-s390x'
+522 silly reify ]
+523 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-linux-riscv64
+524 silly reify mark deleted [
+524 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-linux-riscv64'
+524 silly reify ]
+525 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-linux-ppc64
+526 silly reify mark deleted [
+526 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-linux-ppc64'
+526 silly reify ]
+527 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-linux-arm64
+528 silly reify mark deleted [
+528 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-linux-arm64'
+528 silly reify ]
+529 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-linux-arm
+530 silly reify mark deleted [
+530 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-linux-arm'
+530 silly reify ]
+531 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-linuxmusl-x64
+532 silly reify mark deleted [
+532 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-linuxmusl-x64'
+532 silly reify ]
+533 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-linuxmusl-arm64
+534 silly reify mark deleted [
+534 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-linuxmusl-arm64'
+534 silly reify ]
+535 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-linux-x64
+536 silly reify mark deleted [
+536 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-linux-x64'
+536 silly reify ]
+537 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-linux-s390x
+538 silly reify mark deleted [
+538 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-linux-s390x'
+538 silly reify ]
+539 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-linux-riscv64
+540 silly reify mark deleted [
+540 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-linux-riscv64'
+540 silly reify ]
+541 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-linux-ppc64
+542 silly reify mark deleted [
+542 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-linux-ppc64'
+542 silly reify ]
+543 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-linux-arm64
+544 silly reify mark deleted [
+544 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-linux-arm64'
+544 silly reify ]
+545 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-linux-arm
+546 silly reify mark deleted [
+546 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-linux-arm'
+546 silly reify ]
+547 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-darwin-x64
+548 silly reify mark deleted [
+548 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-libvips-darwin-x64'
+548 silly reify ]
+549 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-darwin-x64
+550 silly reify mark deleted [
+550 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/@img/sharp-darwin-x64'
+550 silly reify ]
+551 http cache @esbuild/darwin-arm64@https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.27.3.tgz 0ms (cache hit)
+552 http cache fsevents@https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz 0ms (cache hit)
+553 http cache esbuild@https://registry.npmjs.org/esbuild/-/esbuild-0.27.3.tgz 0ms (cache hit)
+554 http cache iconv-lite@https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.6.3.tgz 0ms (cache hit)
+555 http cache whatwg-encoding@https://registry.npmjs.org/whatwg-encoding/-/whatwg-encoding-3.1.1.tgz 0ms (cache hit)
+556 http cache nth-check@https://registry.npmjs.org/nth-check/-/nth-check-2.1.1.tgz 0ms (cache hit)
+557 http cache entities@https://registry.npmjs.org/entities/-/entities-4.5.0.tgz 0ms (cache hit)
+558 http cache domelementtype@https://registry.npmjs.org/domelementtype/-/domelementtype-2.3.0.tgz 0ms (cache hit)
+559 http cache css-what@https://registry.npmjs.org/css-what/-/css-what-6.2.2.tgz 0ms (cache hit)
+560 http cache css-select@https://registry.npmjs.org/css-select/-/css-select-5.2.2.tgz 0ms (cache hit)
+561 http cache whatwg-mimetype@https://registry.npmjs.org/whatwg-mimetype/-/whatwg-mimetype-4.0.0.tgz 0ms (cache hit)
+562 http cache boolbase@https://registry.npmjs.org/boolbase/-/boolbase-1.0.0.tgz 0ms (cache hit)
+563 http cache undici@https://registry.npmjs.org/undici/-/undici-7.22.0.tgz 0ms (cache hit)
+564 http cache parse5-parser-stream@https://registry.npmjs.org/parse5-parser-stream/-/parse5-parser-stream-7.1.2.tgz 0ms (cache hit)
+565 http cache parse5-htmlparser2-tree-adapter@https://registry.npmjs.org/parse5-htmlparser2-tree-adapter/-/parse5-htmlparser2-tree-adapter-7.1.0.tgz 0ms (cache hit)
+566 http cache parse5@https://registry.npmjs.org/parse5/-/parse5-7.3.0.tgz 1ms (cache hit)
+567 http cache htmlparser2@https://registry.npmjs.org/htmlparser2/-/htmlparser2-10.1.0.tgz 0ms (cache hit)
+568 http cache safer-buffer@https://registry.npmjs.org/safer-buffer/-/safer-buffer-2.1.2.tgz 0ms (cache hit)
+569 http cache encoding-sniffer@https://registry.npmjs.org/encoding-sniffer/-/encoding-sniffer-0.2.1.tgz 0ms (cache hit)
+570 http cache domutils@https://registry.npmjs.org/domutils/-/domutils-3.2.2.tgz 0ms (cache hit)
+571 http cache cheerio-select@https://registry.npmjs.org/cheerio-select/-/cheerio-select-2.1.0.tgz 0ms (cache hit)
+572 http cache dom-serializer@https://registry.npmjs.org/dom-serializer/-/dom-serializer-2.0.0.tgz 0ms (cache hit)
+573 http cache iceberg-js@https://registry.npmjs.org/iceberg-js/-/iceberg-js-0.8.1.tgz 0ms (cache hit)
+574 http cache ws@https://registry.npmjs.org/ws/-/ws-8.19.0.tgz 0ms (cache hit)
+575 http cache @types/ws@https://registry.npmjs.org/@types/ws/-/ws-8.18.1.tgz 0ms (cache hit)
+576 http cache @types/phoenix@https://registry.npmjs.org/@types/phoenix/-/phoenix-1.6.7.tgz 0ms (cache hit)
+577 http cache @supabase/realtime-js@https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.97.0.tgz 0ms (cache hit)
+578 http cache @supabase/storage-js@https://registry.npmjs.org/@supabase/storage-js/-/storage-js-2.97.0.tgz 0ms (cache hit)
+579 http cache @supabase/postgrest-js@https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-2.97.0.tgz 0ms (cache hit)
+580 http cache @supabase/functions-js@https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.97.0.tgz 0ms (cache hit)
+581 http cache cookie@https://registry.npmjs.org/cookie/-/cookie-0.7.2.tgz 0ms (cache hit)
+582 http cache @supabase/auth-js@https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.97.0.tgz 0ms (cache hit)
+583 http cache tsx@https://registry.npmjs.org/tsx/-/tsx-4.21.0.tgz 0ms (cache hit)
+584 http cache @types/cookie@https://registry.npmjs.org/@types/cookie/-/cookie-0.6.0.tgz 0ms (cache hit)
+585 http cache cheerio@https://registry.npmjs.org/cheerio/-/cheerio-1.2.0.tgz 0ms (cache hit)
+586 http cache @supabase/supabase-js@https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.97.0.tgz 0ms (cache hit)
+587 http cache @supabase/ssr@https://registry.npmjs.org/@supabase/ssr/-/ssr-0.5.2.tgz 0ms (cache hit)
+588 http cache entities@https://registry.npmjs.org/entities/-/entities-6.0.1.tgz 0ms (cache hit)
+589 http cache entities@https://registry.npmjs.org/entities/-/entities-7.0.1.tgz 0ms (cache hit)
+590 http cache domhandler@https://registry.npmjs.org/domhandler/-/domhandler-5.0.3.tgz 0ms (cache hit)
+591 silly tarball no local data for @esbuild/darwin-arm64@https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.27.3.tgz. Extracting by manifest.
+592 silly tarball no local data for fsevents@https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz. Extracting by manifest.
+593 silly tarball no local data for esbuild@https://registry.npmjs.org/esbuild/-/esbuild-0.27.3.tgz. Extracting by manifest.
+594 silly tarball no local data for iconv-lite@https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.6.3.tgz. Extracting by manifest.
+595 silly tarball no local data for whatwg-encoding@https://registry.npmjs.org/whatwg-encoding/-/whatwg-encoding-3.1.1.tgz. Extracting by manifest.
+596 silly tarball no local data for nth-check@https://registry.npmjs.org/nth-check/-/nth-check-2.1.1.tgz. Extracting by manifest.
+597 silly tarball no local data for entities@https://registry.npmjs.org/entities/-/entities-4.5.0.tgz. Extracting by manifest.
+598 silly tarball no local data for domelementtype@https://registry.npmjs.org/domelementtype/-/domelementtype-2.3.0.tgz. Extracting by manifest.
+599 silly tarball no local data for css-what@https://registry.npmjs.org/css-what/-/css-what-6.2.2.tgz. Extracting by manifest.
+600 silly tarball no local data for css-select@https://registry.npmjs.org/css-select/-/css-select-5.2.2.tgz. Extracting by manifest.
+601 silly tarball no local data for whatwg-mimetype@https://registry.npmjs.org/whatwg-mimetype/-/whatwg-mimetype-4.0.0.tgz. Extracting by manifest.
+602 silly tarball no local data for boolbase@https://registry.npmjs.org/boolbase/-/boolbase-1.0.0.tgz. Extracting by manifest.
+603 silly tarball no local data for undici@https://registry.npmjs.org/undici/-/undici-7.22.0.tgz. Extracting by manifest.
+604 silly tarball no local data for parse5-parser-stream@https://registry.npmjs.org/parse5-parser-stream/-/parse5-parser-stream-7.1.2.tgz. Extracting by manifest.
+605 silly tarball no local data for parse5-htmlparser2-tree-adapter@https://registry.npmjs.org/parse5-htmlparser2-tree-adapter/-/parse5-htmlparser2-tree-adapter-7.1.0.tgz. Extracting by manifest.
+606 silly tarball no local data for parse5@https://registry.npmjs.org/parse5/-/parse5-7.3.0.tgz. Extracting by manifest.
+607 silly tarball no local data for htmlparser2@https://registry.npmjs.org/htmlparser2/-/htmlparser2-10.1.0.tgz. Extracting by manifest.
+608 silly tarball no local data for safer-buffer@https://registry.npmjs.org/safer-buffer/-/safer-buffer-2.1.2.tgz. Extracting by manifest.
+609 silly tarball no local data for encoding-sniffer@https://registry.npmjs.org/encoding-sniffer/-/encoding-sniffer-0.2.1.tgz. Extracting by manifest.
+610 silly tarball no local data for domutils@https://registry.npmjs.org/domutils/-/domutils-3.2.2.tgz. Extracting by manifest.
+611 silly tarball no local data for cheerio-select@https://registry.npmjs.org/cheerio-select/-/cheerio-select-2.1.0.tgz. Extracting by manifest.
+612 silly tarball no local data for dom-serializer@https://registry.npmjs.org/dom-serializer/-/dom-serializer-2.0.0.tgz. Extracting by manifest.
+613 silly tarball no local data for iceberg-js@https://registry.npmjs.org/iceberg-js/-/iceberg-js-0.8.1.tgz. Extracting by manifest.
+614 silly tarball no local data for ws@https://registry.npmjs.org/ws/-/ws-8.19.0.tgz. Extracting by manifest.
+615 silly tarball no local data for @types/ws@https://registry.npmjs.org/@types/ws/-/ws-8.18.1.tgz. Extracting by manifest.
+616 silly tarball no local data for @types/phoenix@https://registry.npmjs.org/@types/phoenix/-/phoenix-1.6.7.tgz. Extracting by manifest.
+617 silly tarball no local data for @supabase/realtime-js@https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.97.0.tgz. Extracting by manifest.
+618 silly tarball no local data for @supabase/storage-js@https://registry.npmjs.org/@supabase/storage-js/-/storage-js-2.97.0.tgz. Extracting by manifest.
+619 silly tarball no local data for @supabase/postgrest-js@https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-2.97.0.tgz. Extracting by manifest.
+620 silly tarball no local data for @supabase/functions-js@https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.97.0.tgz. Extracting by manifest.
+621 silly tarball no local data for cookie@https://registry.npmjs.org/cookie/-/cookie-0.7.2.tgz. Extracting by manifest.
+622 silly tarball no local data for @supabase/auth-js@https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.97.0.tgz. Extracting by manifest.
+623 silly tarball no local data for tsx@https://registry.npmjs.org/tsx/-/tsx-4.21.0.tgz. Extracting by manifest.
+624 silly tarball no local data for @types/cookie@https://registry.npmjs.org/@types/cookie/-/cookie-0.6.0.tgz. Extracting by manifest.
+625 silly tarball no local data for cheerio@https://registry.npmjs.org/cheerio/-/cheerio-1.2.0.tgz. Extracting by manifest.
+626 silly tarball no local data for @supabase/supabase-js@https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.97.0.tgz. Extracting by manifest.
+627 silly tarball no local data for @supabase/ssr@https://registry.npmjs.org/@supabase/ssr/-/ssr-0.5.2.tgz. Extracting by manifest.
+628 silly tarball no local data for entities@https://registry.npmjs.org/entities/-/entities-6.0.1.tgz. Extracting by manifest.
+629 silly tarball no local data for entities@https://registry.npmjs.org/entities/-/entities-7.0.1.tgz. Extracting by manifest.
+630 silly tarball no local data for domhandler@https://registry.npmjs.org/domhandler/-/domhandler-5.0.3.tgz. Extracting by manifest.
+631 http fetch GET 200 https://registry.npmjs.org/esbuild/-/esbuild-0.27.3.tgz 57ms (cache miss)
+632 http fetch GET 200 https://registry.npmjs.org/whatwg-encoding/-/whatwg-encoding-3.1.1.tgz 58ms (cache miss)
+633 warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+634 http fetch GET 200 https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz 60ms (cache miss)
+635 http fetch GET 200 https://registry.npmjs.org/nth-check/-/nth-check-2.1.1.tgz 63ms (cache miss)
+636 http fetch GET 200 https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.6.3.tgz 76ms (cache miss)
+637 http fetch GET 200 https://registry.npmjs.org/entities/-/entities-4.5.0.tgz 83ms (cache miss)
+638 http fetch GET 200 https://registry.npmjs.org/safer-buffer/-/safer-buffer-2.1.2.tgz 107ms (cache miss)
+639 http fetch GET 200 https://registry.npmjs.org/cheerio-select/-/cheerio-select-2.1.0.tgz 116ms (cache miss)
+640 http fetch GET 200 https://registry.npmjs.org/encoding-sniffer/-/encoding-sniffer-0.2.1.tgz 116ms (cache miss)
+641 http fetch GET 200 https://registry.npmjs.org/parse5/-/parse5-7.3.0.tgz 123ms (cache miss)
+642 http fetch GET 200 https://registry.npmjs.org/domutils/-/domutils-3.2.2.tgz 123ms (cache miss)
+643 http fetch GET 200 https://registry.npmjs.org/htmlparser2/-/htmlparser2-10.1.0.tgz 131ms (cache miss)
+644 http fetch GET 200 https://registry.npmjs.org/dom-serializer/-/dom-serializer-2.0.0.tgz 140ms (cache miss)
+645 http fetch GET 200 https://registry.npmjs.org/boolbase/-/boolbase-1.0.0.tgz 142ms (cache miss)
+646 http fetch GET 200 https://registry.npmjs.org/iceberg-js/-/iceberg-js-0.8.1.tgz 143ms (cache miss)
+647 http fetch GET 200 https://registry.npmjs.org/ws/-/ws-8.19.0.tgz 148ms (cache miss)
+648 http fetch GET 200 https://registry.npmjs.org/css-what/-/css-what-6.2.2.tgz 152ms (cache miss)
+649 http fetch GET 200 https://registry.npmjs.org/@types/phoenix/-/phoenix-1.6.7.tgz 157ms (cache miss)
+650 http fetch GET 200 https://registry.npmjs.org/parse5-parser-stream/-/parse5-parser-stream-7.1.2.tgz 168ms (cache miss)
+651 http fetch GET 200 https://registry.npmjs.org/@types/ws/-/ws-8.18.1.tgz 169ms (cache miss)
+652 http fetch GET 200 https://registry.npmjs.org/domelementtype/-/domelementtype-2.3.0.tgz 173ms (cache miss)
+653 http fetch GET 200 https://registry.npmjs.org/parse5-htmlparser2-tree-adapter/-/parse5-htmlparser2-tree-adapter-7.1.0.tgz 172ms (cache miss)
+654 http fetch GET 200 https://registry.npmjs.org/whatwg-mimetype/-/whatwg-mimetype-4.0.0.tgz 177ms (cache miss)
+655 http fetch GET 200 https://registry.npmjs.org/cookie/-/cookie-0.7.2.tgz 184ms (cache miss)
+656 http fetch GET 200 https://registry.npmjs.org/@types/cookie/-/cookie-0.6.0.tgz 222ms (cache miss)
+657 http fetch GET 200 https://registry.npmjs.org/domhandler/-/domhandler-5.0.3.tgz 228ms (cache miss)
+658 http fetch GET 200 https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-2.97.0.tgz 243ms (cache miss)
+659 http fetch GET 200 https://registry.npmjs.org/tsx/-/tsx-4.21.0.tgz 246ms (cache miss)
+660 http fetch GET 200 https://registry.npmjs.org/css-select/-/css-select-5.2.2.tgz 250ms (cache miss)
+661 http fetch GET 200 https://registry.npmjs.org/@supabase/storage-js/-/storage-js-2.97.0.tgz 257ms (cache miss)
+662 http fetch GET 200 https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.97.0.tgz 258ms (cache miss)
+663 http fetch GET 200 https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.97.0.tgz 269ms (cache miss)
+664 http fetch GET 200 https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.97.0.tgz 278ms (cache miss)
+665 http fetch GET 200 https://registry.npmjs.org/entities/-/entities-6.0.1.tgz 294ms (cache miss)
+666 http fetch GET 200 https://registry.npmjs.org/@supabase/ssr/-/ssr-0.5.2.tgz 299ms (cache miss)
+667 http fetch GET 200 https://registry.npmjs.org/entities/-/entities-7.0.1.tgz 305ms (cache miss)
+668 http fetch GET 200 https://registry.npmjs.org/cheerio/-/cheerio-1.2.0.tgz 337ms (cache miss)
+669 http fetch GET 200 https://registry.npmjs.org/undici/-/undici-7.22.0.tgz 341ms (cache miss)
+670 http fetch GET 200 https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.97.0.tgz 341ms (cache miss)
+671 http fetch GET 200 https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.27.3.tgz 354ms (cache miss)
+672 info run fsevents@2.3.3 install node_modules/fsevents node-gyp rebuild
+673 info run fsevents@2.3.3 install { code: 1, signal: null }
+674 verbose reify failed optional dependency /Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/fsevents
+675 silly reify mark deleted [
+675 silly reify   '/Users/jamesconnolly/Documents/comox-valley-council-watch/node_modules/fsevents'
+675 silly reify ]
+676 info run esbuild@0.27.3 postinstall node_modules/esbuild node install.js
+677 info run esbuild@0.27.3 postinstall { code: 0, signal: null }
+678 silly ADD
+679 silly ADD
+680 silly ADD
+681 silly ADD
+682 silly ADD
+683 silly ADD
+684 silly ADD
+685 silly ADD
+686 silly ADD
+687 silly ADD
+688 silly ADD
+689 silly ADD
+690 silly ADD
+691 silly ADD
+692 silly ADD
+693 silly ADD
+694 silly ADD
+695 silly ADD
+696 silly ADD
+697 silly ADD
+698 silly ADD
+699 silly ADD node_modules/@esbuild/darwin-arm64
+700 silly ADD
+701 silly ADD
+702 silly ADD
+703 silly ADD
+704 silly ADD
+705 silly ADD node_modules/esbuild
+706 silly ADD node_modules/safer-buffer
+707 silly ADD node_modules/whatwg-encoding
+708 silly ADD node_modules/iconv-lite
+709 silly ADD node_modules/entities
+710 silly ADD node_modules/nth-check
+711 silly ADD node_modules/domelementtype
+712 silly ADD node_modules/css-what
+713 silly ADD node_modules/css-select
+714 silly ADD node_modules/boolbase
+715 silly ADD node_modules/whatwg-mimetype
+716 silly ADD node_modules/undici
+717 silly ADD node_modules/parse5-parser-stream
+718 silly ADD node_modules/parse5-htmlparser2-tree-adapter
+719 silly ADD node_modules/parse5
+720 silly ADD node_modules/parse5/node_modules/entities
+721 silly ADD node_modules/htmlparser2
+722 silly ADD node_modules/htmlparser2/node_modules/entities
+723 silly ADD node_modules/encoding-sniffer
+724 silly ADD node_modules/domutils
+725 silly ADD node_modules/domhandler
+726 silly ADD node_modules/dom-serializer
+727 silly ADD node_modules/cheerio-select
+728 silly ADD node_modules/iceberg-js
+729 silly ADD node_modules/ws
+730 silly ADD node_modules/@types/ws
+731 silly ADD node_modules/@types/phoenix
+732 silly ADD node_modules/@supabase/storage-js
+733 silly ADD node_modules/@supabase/realtime-js
+734 silly ADD node_modules/@supabase/postgrest-js
+735 silly ADD node_modules/@supabase/functions-js
+736 silly ADD node_modules/@supabase/auth-js
+737 silly ADD node_modules/cookie
+738 silly ADD node_modules/@types/cookie
+739 silly ADD node_modules/tsx
+740 silly ADD node_modules/cheerio
+741 silly ADD node_modules/@supabase/supabase-js
+742 silly ADD node_modules/@supabase/ssr
+743 silly ADD
+744 silly ADD
+745 silly ADD
+746 silly ADD
+747 silly ADD
+748 silly ADD
+749 silly ADD
+750 silly ADD
+751 silly ADD
+752 silly ADD
+753 silly ADD
+754 silly ADD
+755 silly ADD
+756 silly ADD
+757 silly ADD
+758 silly ADD
+759 silly ADD
+760 silly ADD
+761 silly ADD
+762 silly ADD
+763 silly ADD
+764 silly ADD
+765 silly ADD
+766 silly ADD
+767 silly ADD
+768 silly ADD
+769 silly ADD
+770 silly ADD
+771 silly ADD
+772 silly ADD
+773 silly ADD
+774 silly ADD
+775 silly ADD
+776 silly ADD
+777 silly ADD
+778 silly ADD
+779 silly ADD
+780 silly ADD
+781 silly ADD
+782 silly ADD
+783 silly ADD
+784 silly ADD
+785 silly ADD
+786 silly ADD
+787 silly ADD
+788 silly ADD
+789 silly ADD
+790 silly ADD
+791 silly ADD
+792 silly ADD
+793 silly ADD
+794 silly ADD
+795 silly ADD
+796 silly ADD
+797 silly ADD
+798 silly ADD
+799 silly ADD
+800 silly ADD
+801 silly ADD
+802 silly ADD
+803 silly ADD
+804 silly ADD
+805 silly ADD
+806 silly ADD
+807 silly ADD
+808 silly ADD
+809 silly ADD
+810 silly ADD
+811 verbose cwd /Users/jamesconnolly/Documents/comox-valley-council-watch
+812 verbose os Darwin 24.6.0
+813 verbose node v22.22.0
+814 verbose npm  v10.9.4
+815 verbose exit 0
+816 info ok
