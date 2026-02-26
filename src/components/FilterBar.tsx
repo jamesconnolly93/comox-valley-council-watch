@@ -13,7 +13,7 @@ export function FilterBar() {
   const [searchInput, setSearchInput] = useState(
     () => searchParams.get("search") ?? ""
   );
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   const search = searchParams.get("search") ?? "";
   const municipality = searchParams.get("municipality") ?? "all";

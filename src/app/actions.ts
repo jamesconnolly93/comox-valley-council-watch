@@ -104,7 +104,7 @@ export async function fetchFilteredItems(params: {
 
   if (error) throw error;
 
-  const items = (data ?? []) as FeedItem[];
+  const items = (data ?? []) as unknown as FeedItem[];
 
   items.sort((a, b) => {
     const dateA = a.meetings?.date ?? "";
