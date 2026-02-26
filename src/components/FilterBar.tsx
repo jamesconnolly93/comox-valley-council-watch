@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { MUNICIPALITIES, CATEGORIES } from "@/lib/feed";
+import { ComplexitySlider } from "./ComplexitySlider";
 
 const SEARCH_DEBOUNCE_MS = 300;
 
@@ -84,6 +85,11 @@ export function FilterBar() {
           ))}
         </div>
 
+        <div className="flex items-center gap-4">
+          <div className="w-[160px] shrink-0">
+            <ComplexitySlider />
+          </div>
+        </div>
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none sm:overflow-visible">
           <span className="shrink-0 text-xs font-medium text-[var(--text-tertiary)]">
             Category

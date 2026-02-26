@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { FilterBar } from "@/components/FilterBar";
 import { MeetingGroup } from "@/components/MeetingGroup";
 import { FeedSkeleton } from "@/components/FeedSkeleton";
+import { ComplexityProviderWrapper } from "@/components/ComplexityProviderWrapper";
 import { fetchFilteredItems } from "./actions";
 
 export const metadata = {
@@ -175,23 +176,25 @@ export default async function HomePage({
       </header>
 
       <main className="relative mx-auto max-w-[720px] px-5 py-8 sm:px-6">
-        <div className="space-y-8">
-          <Suspense
-            fallback={
-              <div className="h-14 rounded-2xl bg-[var(--surface-elevated)] animate-pulse" />
-            }
-          >
-            <FilterBar />
-          </Suspense>
+        <ComplexityProviderWrapper>
+          <div className="space-y-8">
+            <Suspense
+              fallback={
+                <div className="h-14 rounded-2xl bg-[var(--surface-elevated)] animate-pulse" />
+              }
+            >
+              <FilterBar />
+            </Suspense>
 
-          <Suspense fallback={<FeedSkeleton />}>
-            <FeedContent
-              search={search}
-              municipality={municipality}
-              category={category}
-            />
-          </Suspense>
-        </div>
+            <Suspense fallback={<FeedSkeleton />}>
+              <FeedContent
+                search={search}
+                municipality={municipality}
+                category={category}
+              />
+            </Suspense>
+          </div>
+        </ComplexityProviderWrapper>
       </main>
 
       <footer className="mt-16 border-t border-[var(--border)] bg-[var(--surface-elevated)] py-8">

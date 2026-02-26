@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { FeedItem } from "@/lib/feed";
 import { categoryLabel } from "@/lib/feed";
+import { useComplexity } from "@/lib/complexity-context";
 
 const TAG_LIMIT = 5;
 
@@ -89,6 +90,24 @@ function GavelIcon({ className }: { className?: string }) {
   );
 }
 
+function UserIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
 function StarIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -102,6 +121,20 @@ function StarIcon({ className }: { className?: string }) {
   );
 }
 
+function getSummaryForComplexity(
+  item: FeedItem,
+  complexity: "simple" | "standard" | "expert"
+): string {
+  const fallback = item.summary ?? item.description?.slice(0, 200) ?? "No summary available.";
+  if (complexity === "simple" && item.summary_simple?.trim()) {
+    return item.summary_simple.trim();
+  }
+  if (complexity === "expert" && item.summary_expert?.trim()) {
+    return item.summary_expert.trim();
+  }
+  return item.summary?.trim() || fallback;
+}
+
 export function ItemCard({
   item,
   showMeetingMeta = true,
@@ -110,6 +143,7 @@ export function ItemCard({
   showMeetingMeta?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const { complexity } = useComplexity();
   const shortName = item.meetings?.municipalities?.short_name ?? "Unknown";
 
   const badgeClass =
@@ -124,10 +158,9 @@ export function ItemCard({
   const visibleTags = tags.slice(0, TAG_LIMIT);
   const remaining = tags.length - TAG_LIMIT;
 
-  const displaySummary =
-    item.summary ?? item.description?.slice(0, 200) ?? "No summary available.";
+  const displaySummary = getSummaryForComplexity(item, complexity);
   const expandedContent = item.raw_content || item.description || "";
-  const isRedundant = isContentRedundant(item.summary ?? "", expandedContent);
+  const isRedundant = isContentRedundant(displaySummary, expandedContent);
   const hasExpandableContent =
     !!expandedContent && !isRedundant;
   const hasMore =
@@ -147,6 +180,15 @@ export function ItemCard({
         </div>
       )}
 
+      {item.impact?.trim() && (
+        <div className="mb-2 flex items-start gap-1.5">
+          <UserIcon className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
+          <p className="truncate text-sm font-medium text-[var(--accent)] sm:max-w-none sm:overflow-visible sm:whitespace-normal">
+            {item.impact.trim()}
+          </p>
+        </div>
+      )}
+
       {showMeetingMeta && (
         <div className="mb-3">
           <span
@@ -163,7 +205,11 @@ export function ItemCard({
         {item.title}
       </h3>
 
-      <p className="mt-2 leading-relaxed text-[var(--text-secondary)]">
+      <p
+        key={complexity}
+        className="mt-2 leading-relaxed text-[var(--text-secondary)] transition-opacity duration-150"
+        style={{ animation: "fade-in 0.15s ease-out" }}
+      >
         {displaySummary}
       </p>
 

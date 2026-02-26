@@ -86,10 +86,13 @@ async function main() {
         .from("items")
         .update({
           summary: parsed.summary ?? null,
+          summary_simple: parsed.summary_simple ?? null,
+          summary_expert: parsed.summary_expert ?? null,
           category: primaryCategory,
           categories: cats.length ? cats : null,
           tags: tags.length ? tags : null,
           is_significant: parsed.is_significant === true,
+          impact: parsed.impact ?? null,
           metadata: {
             ...(item.metadata || {}),
             ai_response: parsed,

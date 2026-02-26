@@ -17,7 +17,10 @@
     "test:ai": "node scripts/test-ai-pipeline.mjs",
     "test:decision": "node scripts/test-decision-extraction.mjs",
     "pipeline": "node scripts/run-pipeline.mjs",
-    "process:ai": "node scripts/process-ai-summaries.mjs"
+    "process:ai": "node scripts/process-ai-summaries.mjs",
+    "reprocess:impacts": "node scripts/reprocess-impacts.mjs",
+    "reprocess:summaries": "node scripts/reprocess-summaries.mjs",
+    "reprocess:summaries:dry": "node scripts/reprocess-summaries.mjs --dry-run"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",

@@ -3,10 +3,13 @@ export type FeedItem = {
   title: string;
   description: string | null;
   summary: string | null;
+  summary_simple: string | null;
+  summary_expert: string | null;
   category: string | null;
   categories: string[] | null;
   tags: string[] | null;
   decision: string | null;
+  impact: string | null;
   raw_content: string | null;
   is_significant: boolean | null;
   meeting_id: string;
