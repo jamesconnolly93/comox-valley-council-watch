@@ -178,13 +178,15 @@ export default async function HomePage({
       <main className="relative mx-auto max-w-[720px] px-5 py-8 sm:px-6">
         <ComplexityProviderWrapper>
           <div className="space-y-8">
-            <Suspense
-              fallback={
-                <div className="h-14 rounded-2xl bg-[var(--surface-elevated)] animate-pulse" />
-              }
-            >
-              <FilterBar />
-            </Suspense>
+            <div className="sticky top-0 z-30 -mx-5 bg-[var(--background)] px-5 pt-6 pb-4 shadow-sm sm:-mx-6 sm:px-6 border-b border-[var(--border)]">
+              <Suspense
+                fallback={
+                  <div className="h-14 rounded-2xl bg-[var(--surface-elevated)] animate-pulse" />
+                }
+              >
+                <FilterBar />
+              </Suspense>
+            </div>
 
             <Suspense fallback={<FeedSkeleton />}>
               <FeedContent

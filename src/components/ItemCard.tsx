@@ -10,7 +10,10 @@ const TAG_LIMIT = 5;
 /** Only show impactful callouts; hide generic "no impact" variants */
 function isActionableImpact(impact: string): boolean {
   if (!impact) return false;
-  if (/^no (direct |immediate )?impact/i.test(impact)) return false;
+  const normalized = impact.trim().toLowerCase();
+  if (normalized.startsWith("no direct impact")) return false;
+  if (normalized.startsWith("no immediate impact")) return false;
+  if (normalized.startsWith("no impact")) return false;
   return true;
 }
 
