@@ -19,6 +19,7 @@ export type CommunitySignal = {
     | "petition"
     | "public_hearing"
     | "engagement"
+    | "service_delivery"
     | "other";
   participant_count: number | null;
   summary: string | null;

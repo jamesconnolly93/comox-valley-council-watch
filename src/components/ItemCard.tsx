@@ -184,6 +184,7 @@ function communitySignalBadgeLabel(signal: CommunitySignal): string {
     case "petition": return n ? `${n} petition signatures` : "Petition";
     case "public_hearing": return n ? `${n} at public hearing` : "Public hearing";
     case "engagement": return n ? `${n} participants` : "Community engagement";
+    case "service_delivery": return n ? `${n.toLocaleString()} calls/events` : "Service data";
     default: return n ? `${n} responses` : "Community input";
   }
 }

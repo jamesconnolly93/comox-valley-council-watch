@@ -219,13 +219,15 @@ function LightweightSignal({ signal }: { signal: CommunitySignal }) {
     <div className="mt-3">
       <p className="text-sm text-[var(--text-secondary)]">
         <span className="font-medium text-[var(--text-primary)]">
-          {signal.participant_count ? `${signal.participant_count} ` : ""}
+          {signal.participant_count ? `${signal.participant_count.toLocaleString()} ` : ""}
           {signal.type === "survey"
             ? "survey respondents"
             : signal.type === "delegation"
             ? "delegations"
             : signal.type === "petition"
             ? "petition signatures"
+            : signal.type === "service_delivery"
+            ? "calls/events"
             : "participants"}
           :
         </span>{" "}
