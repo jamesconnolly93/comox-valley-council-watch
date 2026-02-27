@@ -24,7 +24,9 @@
     "process:feedback:dry": "node scripts/process-feedback.mjs --dry-run",
     "reprocess:impacts": "node scripts/reprocess-impacts.mjs",
     "reprocess:summaries": "node scripts/reprocess-summaries.mjs",
-    "reprocess:summaries:dry": "node scripts/reprocess-summaries.mjs --dry-run"
+    "reprocess:summaries:dry": "node scripts/reprocess-summaries.mjs --dry-run",
+    "send:digest": "node scripts/send-digest.mjs",
+    "send:digest:dry": "node scripts/send-digest.mjs --dry-run"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
@@ -35,7 +37,8 @@
     "pdf-parse": "^1.1.1",
     "playwright": "^1.58.2",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "resend": "^6.9.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

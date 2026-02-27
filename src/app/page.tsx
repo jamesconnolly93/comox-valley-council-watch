@@ -5,6 +5,7 @@ import { FeedSkeleton } from "@/components/FeedSkeleton";
 import { ComplexityProviderWrapper } from "@/components/ComplexityProviderWrapper";
 import { fetchFilteredItems, getHighlights } from "./actions";
 import { Highlights } from "@/components/Highlights";
+import { DigestSignup } from "@/components/DigestSignup";
 
 export const metadata = {
   title: "Comox Valley Council Watch",
@@ -197,6 +198,8 @@ export default async function HomePage({
             {highlights.length > 0 && (
               <Highlights items={highlights} />
             )}
+
+            <DigestSignup />
 
             <Suspense fallback={<FeedSkeleton />}>
               <FeedContent

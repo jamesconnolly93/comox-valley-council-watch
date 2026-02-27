@@ -6,6 +6,7 @@ import type { FeedItem } from "@/lib/feed";
 import { categoryLabel, isActionableImpact, formatMeetingDateShort, municipalityBadgeClass } from "@/lib/feed";
 import { useComplexity } from "@/lib/complexity-context";
 import { CommunityVoices } from "./CommunityVoices";
+import { ReactionButton } from "./ReactionButton";
 
 const TAG_LIMIT = 5;
 
@@ -258,6 +259,10 @@ export function ItemCard({
             .join(", ")}
         </p>
       )}
+
+      <div className="mt-3" onClick={(e) => e.stopPropagation()}>
+        <ReactionButton itemId={item.id} />
+      </div>
 
       {publicFeedback && (
         <CommunityVoices data={publicFeedback} />
