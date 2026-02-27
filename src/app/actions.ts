@@ -4,14 +4,27 @@ import { createClient } from "@/lib/supabase/server";
 import type { FeedItem, MeetingWithItems } from "@/lib/feed";
 import { groupItemsByMeeting, isActionableImpact } from "@/lib/feed";
 
+/**
+ * Extract a bylaw number from a title string as a fallback when the
+ * `bylaw_number` DB column hasn't been populated yet via AI reprocessing.
+ * Handles patterns like "Bylaw No. 2056", "Bylaw No. 2056 –", "Bylaw 2025-3".
+ */
+function extractBylawFromTitle(title: string): string | null {
+  const m = title.match(/Bylaw\s+No\.?\s*(\d[\w-]*)/i);
+  return m?.[1] ?? null;
+}
+
 /** Deduplicate bylaw items across meetings: keep most recent, attach history to it. */
 function applyBylawDeduplication(items: FeedItem[]): FeedItem[] {
   const bylawGroups = new Map<string, FeedItem[]>();
   for (const item of items) {
-    if (item.bylaw_number) {
-      const existing = bylawGroups.get(item.bylaw_number);
+    // Prefer the DB-populated bylaw_number; fall back to parsing the title so
+    // deduplication works even before AI reprocessing has run.
+    const key = item.bylaw_number || extractBylawFromTitle(item.title ?? "");
+    if (key) {
+      const existing = bylawGroups.get(key);
       if (existing) existing.push(item);
-      else bylawGroups.set(item.bylaw_number, [item]);
+      else bylawGroups.set(key, [item]);
     }
   }
 
@@ -172,7 +185,7 @@ export async function fetchFilteredItems(params: {
 
 export type HighlightItem = FeedItem;
 
-/** Fetch curated highlights (is_significant + actionable impact) for "This Week" hero */
+/** Fetch curated highlights (is_significant) for "This Week" hero */
 export async function getHighlights(limit = 5): Promise<HighlightItem[]> {
   const supabase = await createClient();
 
@@ -184,23 +197,28 @@ export async function getHighlights(limit = 5): Promise<HighlightItem[]> {
     )
   `;
 
+  // Fetch a larger candidate pool — no DB-level ordering on joined columns,
+  // so we fetch many and sort/slice in JS to get the most recent `limit` items.
+  const CANDIDATE_LIMIT = limit * 8;
+
   let { data } = await supabase
     .from("items")
     .select(selectCols)
     .eq("is_significant", true)
     .not("impact", "is", null)
-    .limit(limit);
+    .limit(CANDIDATE_LIMIT);
 
-  if (!data || data.length < 3) {
+  // Fallback: any significant items regardless of impact text
+  if (!data?.length) {
     const { data: fallback } = await supabase
       .from("items")
       .select(selectCols)
       .eq("is_significant", true)
-      .limit(limit);
+      .limit(CANDIDATE_LIMIT);
     data = fallback;
   }
 
-  if (!data || data.length < 3) return [];
+  if (!data?.length) return [];
 
   const items = data as unknown as HighlightItem[];
 
@@ -208,6 +226,7 @@ export async function getHighlights(limit = 5): Promise<HighlightItem[]> {
     if (!isActionableImpact(item.impact)) item.impact = null;
   }
 
+  // Sort by meeting date descending so the most recent items surface first
   items.sort((a, b) => {
     const dateA = a.meetings?.date ?? "";
     const dateB = b.meetings?.date ?? "";
