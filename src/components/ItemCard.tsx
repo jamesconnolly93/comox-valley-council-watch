@@ -9,7 +9,7 @@ import {
   municipalityBadgeClass,
   normaliseFeedback,
   deriveReadingStatus,
-  formatMeetingDate,
+  formatMeetingDateMedium,
 } from "@/lib/feed";
 import { useComplexity } from "@/lib/complexity-context";
 import { CommunityVoices } from "./CommunityVoices";
@@ -21,51 +21,6 @@ function formatTag(tag: string): string {
   return tag
     .replace(/_/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-function cleanContent(text: string, title: string): string {
-  if (!text) return "";
-  let result = text
-    .replace(
-      /\w+ \d{1,2},?\s*\d{4},?\s*(?:Regular |Strategic )?(?:Council |Planning )?(?:Meeting|Committee)\s*(?:Agenda|Meeting)?(?:\s*Page)?\s*\d*/gi,
-      ""
-    )
-    .replace(
-      /Town of Comox\s+Bylaw No\.\s*\d+\s*[–-]\s*[^\n]+Page\s*\d+/gi,
-      ""
-    )
-    .replace(/^[.\s…]{10,}$/gm, "")
-    .replace(/STRATEGIC PLAN LINKAGE[\s\S]*?(?=\n\n|\n[A-Z])/gi, "")
-    .replace(/Strategic Priority\s+Areas of Focus[\s\S]*?(?=\n\n)/gi, "")
-    .replace(/Core Services\s*•[^\n]*/g, "")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-  if (title.trim()) {
-    const escapedTitle = title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    result = result
-      .replace(new RegExp(`^${escapedTitle}\\s*$`, "gmi"), "")
-      .trim();
-  }
-  return result;
-}
-
-function isContentRedundant(
-  summary: string | null,
-  expanded: string | null,
-  title: string
-): boolean {
-  if (!summary || !expanded) return false;
-  const cleaned = cleanContent(expanded, title);
-  if (cleaned.length < 80) return true;
-  const summaryLen = summary.trim().length;
-  const expandedLen = cleaned.length;
-  if (summaryLen > 0 && expandedLen < summaryLen * 1.5) return true;
-  const normalize = (s: string) =>
-    s.trim().toLowerCase().replace(/\s+/g, " ").slice(0, 100);
-  const a = normalize(summary);
-  const b = normalize(cleaned);
-  if (a.length < 40 || b.length < 40) return false;
-  return a === b || a.startsWith(b) || b.startsWith(a);
 }
 
 function getSummaryForComplexity(
@@ -85,6 +40,31 @@ function getSummaryForComplexity(
 function firstSentence(text: string): string {
   const m = text.match(/^[^.!?]+[.!?]/);
   return m ? m[0].trim() : text.slice(0, 120).trim();
+}
+
+/**
+ * Strip leading date patterns from a meeting title so the card shows
+ * just "Regular Council Meeting" instead of "February 18, 2026 Regular Council Meeting".
+ */
+function cleanMeetingTitle(title: string): string {
+  return title
+    .replace(
+      /^(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s*\d{4}\s*/i,
+      ""
+    )
+    .trim();
+}
+
+/** True when impact text is personal/financial — drives the amber left border accent. */
+function isHighImpact(impact: string | null | undefined): boolean {
+  if (!impact) return false;
+  const t = impact.trim();
+  return (
+    t.startsWith("Your") ||
+    t.startsWith("If you") ||
+    t.includes("$") ||
+    t.includes("%")
+  );
 }
 
 // ---- Icons ----
@@ -177,7 +157,7 @@ function ShareIcon({ className }: { className?: string }) {
   );
 }
 
-function SpeechBubbleSmall({ className }: { className?: string }) {
+function LettersIcon({ className }: { className?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -201,6 +181,7 @@ export function ItemCard({
   isThreadChild = false,
 }: {
   item: FeedItem;
+  /** @deprecated badge is always shown; kept for call-site compatibility */
   showMeetingMeta?: boolean;
   isThreadChild?: boolean;
 }) {
@@ -217,36 +198,34 @@ export function ItemCard({
   const remaining = tags.length - TAG_LIMIT;
 
   const displaySummary = getSummaryForComplexity(item, complexity);
-  const expandedContent = item.raw_content || item.description || "";
-  const isRedundant = isContentRedundant(
-    displaySummary,
-    expandedContent,
-    item.title || ""
-  );
-  const hasExpandableContent = !!expandedContent && !isRedundant;
-
   const impactText = isActionableImpact(item.impact) ? item.impact!.trim() : null;
+  const highImpact = !isThreadChild && isHighImpact(item.impact);
 
-  // What shows in the collapsed subtitle row
+  // Collapsed subtitle: reading status for thread children, impact snippet for regular cards
   const collapsedSubtitle = isThreadChild
     ? deriveReadingStatus(item)
     : impactText
     ? firstSentence(impactText)
     : null;
 
-  // Primary label for thread child collapsed row (date + meeting title)
-  const meetingDateLabel = formatMeetingDate(item.meetings?.date);
-  const meetingTitle = item.meetings?.title;
-  const threadPrimaryLabel = meetingTitle
-    ? `${meetingDateLabel} — ${meetingTitle}`
-    : meetingDateLabel;
+  // Thread child header: "Feb 18, 2026 — Regular Council Meeting"
+  const rawMeetingTitle = item.meetings?.title ?? "";
+  const cleanedMeetingTitle = cleanMeetingTitle(rawMeetingTitle);
+  const threadPrimaryLabel = cleanedMeetingTitle
+    ? `${formatMeetingDateMedium(item.meetings?.date)} — ${cleanedMeetingTitle}`
+    : formatMeetingDateMedium(item.meetings?.date);
+
+  // Border: amber left accent for high-impact, subtle amber all-around for is_significant
+  const borderClass = highImpact
+    ? "border border-[var(--border)] border-l-[3px] border-l-amber-400"
+    : item.is_significant && !isThreadChild
+    ? "border border-amber-200/70"
+    : "border border-[var(--border)]";
 
   return (
     <article
       id={item.id}
-      className={`group relative scroll-mt-24 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-sm transition-shadow duration-200 hover:shadow-md ${
-        item.is_significant && !isThreadChild ? "border-amber-200/60" : ""
-      }`}
+      className={`group relative scroll-mt-24 overflow-hidden rounded-xl bg-[var(--surface)] shadow-sm transition-shadow duration-200 hover:shadow-md ${borderClass}`}
     >
       {/* Collapsed header — always visible */}
       <div
@@ -259,7 +238,7 @@ export function ItemCard({
         }
         className="flex cursor-pointer flex-col gap-1 px-4 py-3 select-none"
       >
-        {/* Row 1: badge + title/date + star + chevron */}
+        {/* Row 1: badge · title/date · [significant star] · [letters badge] · chevron */}
         <div className="flex min-w-0 items-center gap-2">
           <span
             className={`inline-flex shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium ${badgeClass}`}
@@ -282,29 +261,30 @@ export function ItemCard({
           {item.is_significant && !isThreadChild && (
             <StarIcon className="h-3.5 w-3.5 shrink-0 text-amber-400" />
           )}
+
+          {/* Community letters badge — warm pill, visible at a glance */}
+          {feedbackCount > 0 && (
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
+              <LettersIcon className="h-3 w-3" />
+              {feedbackCount}
+            </span>
+          )}
+
           <ChevronIcon expanded={expanded} />
         </div>
 
-        {/* Row 2: subtitle + community badge */}
-        {(collapsedSubtitle || feedbackCount > 0) && (
-          <div className="flex min-w-0 items-center gap-3">
-            {collapsedSubtitle && (
-              <span
-                className={`min-w-0 flex-1 truncate text-sm ${
-                  isThreadChild
-                    ? "font-medium text-[var(--text-primary)]"
-                    : "text-[var(--text-secondary)]"
-                }`}
-              >
-                {collapsedSubtitle}
-              </span>
-            )}
-            {feedbackCount > 0 && (
-              <span className="ml-auto flex shrink-0 items-center gap-1 text-xs text-[var(--text-tertiary)]">
-                <SpeechBubbleSmall className="h-3 w-3" />
-                {feedbackCount} letters
-              </span>
-            )}
+        {/* Row 2: subtitle (impact snippet or reading status) */}
+        {collapsedSubtitle && (
+          <div className="flex min-w-0 pl-0.5">
+            <span
+              className={`min-w-0 flex-1 truncate text-sm ${
+                isThreadChild
+                  ? "font-medium text-[var(--text-primary)]"
+                  : "text-[var(--text-secondary)]"
+              }`}
+            >
+              {collapsedSubtitle}
+            </span>
           </div>
         )}
       </div>
@@ -315,7 +295,7 @@ export function ItemCard({
         style={{ gridTemplateRows: expanded ? "1fr" : "0fr" }}
       >
         <div className="overflow-hidden">
-          <div className="border-t border-[var(--border)] px-4 pb-4 pt-4 space-y-3">
+          <div className="space-y-3 border-t border-[var(--border)] px-4 pb-4 pt-4">
             {/* Impact callout (regular cards only) */}
             {!isThreadChild && impactText && (
               <div className="flex items-start gap-1.5">
@@ -326,7 +306,7 @@ export function ItemCard({
               </div>
             )}
 
-            {/* Summary */}
+            {/* Summary at current complexity level */}
             <p
               key={complexity}
               className="leading-relaxed text-[var(--text-secondary)]"
@@ -334,18 +314,6 @@ export function ItemCard({
             >
               {displaySummary}
             </p>
-
-            {/* Raw content (when not redundant with summary) */}
-            {hasExpandableContent && (
-              <div className="rounded-lg bg-[var(--surface-elevated)] p-4 text-sm text-[var(--text-secondary)]">
-                <h4 className="mb-2 font-medium text-[var(--text-primary)]">
-                  Full description
-                </h4>
-                <div className="whitespace-pre-wrap leading-relaxed">
-                  {cleanContent(expandedContent, item.title || "")}
-                </div>
-              </div>
-            )}
 
             {/* Decision */}
             {item.decision && (
@@ -369,7 +337,7 @@ export function ItemCard({
               <ReactionButton itemId={item.id} />
             </div>
 
-            {/* Community Voices */}
+            {/* Community Voices — above tags so it's prominent */}
             {feedback && <CommunityVoices data={feedback} />}
 
             {/* Category + tag pills */}

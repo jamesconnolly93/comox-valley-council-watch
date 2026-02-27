@@ -223,26 +223,62 @@ export function groupItemsByMeeting(items: FeedItem[]): MeetingWithItems[] {
 
 /**
  * Derive a short status string for a bylaw reading, used in thread child cards.
- * Checks decision text for reading stage keywords; falls back to summary excerpt.
+ * Checks decision, raw_content, description, and summary in order of reliability.
  */
 export function deriveReadingStatus(item: FeedItem): string {
   const decision = (item.decision ?? "").toLowerCase();
+  const raw = (item.raw_content ?? "").toLowerCase();
+  const desc = (item.description ?? "").toLowerCase();
+  const summary = (item.summary ?? "").toLowerCase();
 
-  if (decision.includes("adopted") || decision.includes("finally passed")) return "Adopted";
-  if (decision.includes("third reading") || decision.includes("3rd reading")) return "Third reading";
-  if (
-    decision.includes("first and second reading") ||
-    decision.includes("1st and 2nd reading") ||
-    decision.includes("first & second reading")
-  ) return "First & second reading";
-  if (decision.includes("second reading") || decision.includes("2nd reading")) return "Second reading";
-  if (decision.includes("first reading") || decision.includes("1st reading")) return "First reading";
-  if (decision.includes("public hearing")) return "Public hearing scheduled";
-  if (decision.includes("referred")) return "Referred";
+  // Helper: search across a given text blob
+  function check(t: string): string | null {
+    if (!t) return null;
+    // "Adopted" wins over just "third reading"
+    if (
+      (t.includes("third reading") || t.includes("3rd reading")) &&
+      (t.includes("adopted") || t.includes("finally passed"))
+    ) return "Adopted";
+    if (t.includes("adopted") || t.includes("finally passed")) return "Adopted";
+    if (t.includes("third reading") || t.includes("3rd reading")) return "Third reading";
+    if (
+      t.includes("first and second reading") ||
+      t.includes("1st and 2nd reading") ||
+      t.includes("first & second reading") ||
+      t.includes("initial readings") ||
+      (t.includes("first reading") && t.includes("second reading"))
+    ) return "First & second reading";
+    if (t.includes("second reading") || t.includes("2nd reading")) return "Second reading";
+    if (t.includes("first reading") || t.includes("1st reading")) return "First reading";
+    if (t.includes("public hearing")) return "Public hearing";
+    if (t.includes("received for information")) return "Received for information";
+    if (t.includes("referred") || t.includes("referral")) return "Referred";
+    if (t.includes("tabled") || t.includes("deferred")) return "Deferred";
+    return null;
+  }
 
-  const text = item.summary ?? item.description ?? "";
-  if (text.length > 80) return text.slice(0, 80).trimEnd() + "\u2026";
-  return text || item.title || "";
+  return (
+    check(decision) ??
+    check(raw) ??
+    check(desc) ??
+    check(summary) ??
+    (() => {
+      const text = item.summary ?? item.description ?? "";
+      return text.length > 80 ? text.slice(0, 80).trimEnd() + "\u2026" : text || item.title || "";
+    })()
+  );
+}
+
+/** Medium date: "Feb 18, 2026" — month abbreviation + day + year */
+export function formatMeetingDateMedium(dateStr: string | undefined): string {
+  if (!dateStr) return "";
+  const datePart = dateStr.slice(0, 10);
+  const parts = datePart.split("-").map(Number);
+  if (parts.length !== 3 || parts.some(isNaN)) return "";
+  const [year, month, day] = parts;
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  if (month < 1 || month > 12) return "";
+  return `${months[month - 1]} ${day}, ${year}`;
 }
 
 /** Abbreviated date for inline use, e.g. "Jan 21" */
