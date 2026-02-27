@@ -82,7 +82,7 @@ export function IssueGroupSection({ group }: { group: IssueGroup }) {
               )}
             </div>
             <h2 className="font-fraunces text-lg font-semibold text-[var(--text-primary)]">
-              {group.title}
+              {group.items[0]?.headline ?? group.title}
             </h2>
           </>
         )}

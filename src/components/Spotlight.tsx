@@ -3,7 +3,6 @@
 import Link from "next/link";
 import type { FeedItem, KeyStat, CommunitySignal } from "@/lib/feed";
 import {
-  isHighImpact,
   isActionableImpact,
   municipalityBadgeClass,
   normaliseFeedback,
@@ -25,9 +24,27 @@ function getSummaryForComplexity(
   return item.summary?.trim() || fallback;
 }
 
-function firstSentence(text: string): string {
-  const m = text.match(/^[^.!?]+[.!?]/);
-  return m ? m[0].trim() : text.slice(0, 160).trim();
+/**
+ * Abbreviation-safe first-sentence extractor.
+ * Protects "Bylaw No.", "Dr.", "St." etc. from false splits.
+ */
+function getFirstSentence(text: string): string {
+  if (!text) return "";
+  // Replace known abbreviations with a protected form (zero-width space before the period)
+  const guarded = text
+    .replace(/\bNo\./g, "No\u200B.")
+    .replace(/\bDr\./g, "Dr\u200B.")
+    .replace(/\bSt\./g, "St\u200B.")
+    .replace(/\bMr\./g, "Mr\u200B.")
+    .replace(/\bMs\./g, "Ms\u200B.")
+    .replace(/\bvs\./g, "vs\u200B.")
+    .replace(/\be\.g\./g, "e\u200Bg.")
+    .replace(/\bi\.e\./g, "i\u200Be.");
+  // Split on sentence-ending punctuation followed by whitespace + uppercase letter
+  const m = guarded.match(/^(.+?[.!?])\s+[A-Z]/);
+  const sentence = m ? m[1] : guarded.slice(0, 200);
+  // Remove zero-width spaces and trim
+  return sentence.replace(/\u200B/g, "").trim();
 }
 
 /** Derive the static editorial headline with fallback chain */
@@ -35,7 +52,19 @@ function deriveHeadline(item: FeedItem): string {
   if (item.headline?.trim()) return item.headline.trim();
   const impactText = isActionableImpact(item.impact) ? item.impact!.trim() : null;
   if (impactText) return impactText;
-  return firstSentence(item.summary ?? item.description?.slice(0, 200) ?? item.title ?? "");
+  return getFirstSentence(item.summary ?? item.description?.slice(0, 200) ?? item.title ?? "")
+    || (item.title ?? "");
+}
+
+/**
+ * Derive the subtitle (changes with reading level).
+ * Priority: actionable impact text → first sentence of summary → truncated summary.
+ */
+function getSubtitle(item: FeedItem, complexity: "simple" | "standard" | "expert"): string {
+  const impactText = isActionableImpact(item.impact) ? item.impact!.trim() : null;
+  if (impactText) return impactText;
+  const summary = getSummaryForComplexity(item, complexity);
+  return getFirstSentence(summary) || (item.summary ?? "").slice(0, 200);
 }
 
 function statPillClass(type: KeyStat["type"]): string {
@@ -213,7 +242,7 @@ function SpotlightStory({ item }: { item: FeedItem }) {
   const badgeClass = municipalityBadgeClass(shortName);
 
   const headline = deriveHeadline(item);
-  const summaryExcerpt = firstSentence(getSummaryForComplexity(item, complexity));
+  const subtitle = getSubtitle(item, complexity);
 
   const bylawNum = item.bylaw_number || extractBylawFromTitle(item.title ?? "");
   const anchor = bylawNum ? `#${shortName}_${bylawNum}` : `#${item.id}`;
@@ -228,8 +257,6 @@ function SpotlightStory({ item }: { item: FeedItem }) {
   const feedback = normaliseFeedback(item.public_feedback);
   const hasFeedback = (feedback?.feedback_count ?? 0) > 0;
   const signal: CommunitySignal | null = item.community_signal ?? null;
-  const highImpact = isHighImpact(item.impact);
-  const impactText = isActionableImpact(item.impact) ? item.impact!.trim() : null;
 
   return (
     <div className="px-4 py-4 sm:px-5">
@@ -252,13 +279,13 @@ function SpotlightStory({ item }: { item: FeedItem }) {
         {headline}
       </h3>
 
-      {/* Summary excerpt — changes with reading level */}
+      {/* Subtitle — changes with reading level (impact text first, then summary sentence) */}
       <p
         key={complexity}
         className="mt-1 text-sm leading-relaxed text-[var(--text-secondary)]"
         style={{ animation: "fade-in 0.15s ease-out" }}
       >
-        {summaryExcerpt}
+        {subtitle}
       </p>
 
       {/* Key stats pills */}
@@ -273,11 +300,6 @@ function SpotlightStory({ item }: { item: FeedItem }) {
             </span>
           ))}
         </div>
-      )}
-
-      {/* Impact callout — only for high-impact items without community letters */}
-      {highImpact && !hasFeedback && !signal && impactText && (
-        <p className="mt-2 text-sm font-medium text-[var(--accent)]">{impactText}</p>
       )}
 
       {/* Community bar (full, from public_feedback pipeline) */}

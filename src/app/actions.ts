@@ -167,13 +167,45 @@ export async function fetchFilteredItems(params: {
   return { issueGroups, standaloneGroups, dbEmpty: false };
 }
 
-/** Score an item for spotlight selection */
+/** Score an item for spotlight selection.
+ * NOTE: must be called before impact nullification so isHighImpact works. */
 function spotlightScore(item: FeedItem, reactionCounts: Map<string, number>): number {
   let score = 0;
   const fb = normaliseFeedback(item.public_feedback);
-  if (fb?.feedback_count) score += fb.feedback_count;
+  const impact = item.impact?.trim() ?? "";
+
+  // Community voices — the strongest signal
+  if (fb?.feedback_count) score += fb.feedback_count * 2;
+
+  // Reactions
   score += (reactionCounts.get(item.id) ?? 0) * 5;
-  if (isHighImpact(item.impact)) score += 30;
+
+  // High-impact bonus (personal or financial)
+  if (isHighImpact(impact)) score += 50;
+
+  // Direct financial impact: "$" + a digit in the impact text
+  if (impact.includes("$") && /\d/.test(impact)) score += 40;
+
+  // Personally addressed ("Your ...")
+  if (impact.startsWith("Your")) score += 30;
+
+  // Deprioritise non-impactful items (these will NOT be nullified yet at scoring time)
+  const impactLower = impact.toLowerCase();
+  if (
+    impactLower.startsWith("no direct impact") ||
+    impactLower.startsWith("no immediate impact")
+  )
+    score -= 20;
+
+  // Lightweight community signal (surveys, delegations, etc.)
+  const signal = item.community_signal;
+  if (signal?.participant_count && signal.participant_count > 10) {
+    score += signal.participant_count;
+  }
+
+  // Concrete data bonus
+  if (Array.isArray(item.key_stats) && item.key_stats.length > 0) score += 10;
+
   return score;
 }
 
@@ -217,12 +249,7 @@ export async function getSpotlightItems(limit = 2): Promise<FeedItem[]> {
 
   const items = data as unknown as FeedItem[];
 
-  // Nullify non-actionable impacts
-  for (const item of items) {
-    if (!isActionableImpact(item.impact)) item.impact = null;
-  }
-
-  // Fetch reaction counts for scoring
+  // Fetch reaction counts for scoring (before nullification so isHighImpact works correctly)
   const itemIds = items.map((i) => i.id);
   const { data: reactions } = await supabase
     .from("reactions")
@@ -234,8 +261,13 @@ export async function getSpotlightItems(limit = 2): Promise<FeedItem[]> {
     reactionCounts.set(r.item_id, (reactionCounts.get(r.item_id) ?? 0) + 1);
   }
 
-  // Sort by score descending
+  // Sort by score descending (uses raw impact text before nullification)
   items.sort((a, b) => spotlightScore(b, reactionCounts) - spotlightScore(a, reactionCounts));
+
+  // Nullify non-actionable impacts after scoring (so UI never shows "No direct impact..." callouts)
+  for (const item of items) {
+    if (!isActionableImpact(item.impact)) item.impact = null;
+  }
 
   // Pick top N, deduplicating bylaw thread siblings
   const selectedBylawKeys = new Set<string>();

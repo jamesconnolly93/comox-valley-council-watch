@@ -231,8 +231,10 @@ export function ItemCard({
     ? `${formatMeetingDateMedium(item.meetings?.date)} — ${cleanedMeetingTitle}`
     : formatMeetingDateMedium(item.meetings?.date);
 
-  // Card title: strip "Bylaw No. XXXX – " prefix from item title in regular cards
-  const displayTitle = isThreadChild ? item.title : cleanItemTitle(item.title);
+  // Card title: prefer AI headline (clean, editorial), fall back to cleaned raw title
+  const displayTitle = isThreadChild
+    ? item.title
+    : (item.headline ?? cleanItemTitle(item.title));
 
   // Border: amber left accent for high-impact, subtle amber all-around for is_significant
   const borderClass = highImpact
