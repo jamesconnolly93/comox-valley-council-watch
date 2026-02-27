@@ -13,6 +13,7 @@ Given a council meeting item, return ONLY a JSON object with no markdown formatt
   "tags": ["specific_topic_tag"],
   "decision": "What council decided, or null if not yet decided",
   "impact": "One punchy sentence starting with 'You' or 'Your' that tells a resident why this matters to them personally. Be specific with numbers when available. Examples: 'Your property taxes are going up ~7% this year.' 'New fees of $X per unit if you're building a home.' 'Your water bill may increase $29-33/year.' If the item doesn't directly affect residents, say so: 'No direct impact — this is an internal governance matter.'",
+  "bylaw_number": "1234 or null",
   "is_significant": true/false
 }
 
@@ -23,7 +24,9 @@ Example for the Financial Plan Bylaw:
 
 Categories (use 1-3): development, infrastructure, finance, housing, environment, parks_recreation, governance, community, safety, other
 
-For tags, use 2-5 specific identifiers: place names, project names, policy names, dollar amounts, bylaw numbers.`;
+For tags, use 2-5 specific identifiers: place names, project names, policy names, dollar amounts, bylaw numbers.
+
+For bylaw_number: extract just the numeric identifier (e.g. "3211" from "Bylaw No. 3211", "2025-15" from "Bylaw 2025-15"). Return null if no bylaw is referenced.`;
 
 export function buildUserMessage(item) {
   const { title, description, decision } = item;

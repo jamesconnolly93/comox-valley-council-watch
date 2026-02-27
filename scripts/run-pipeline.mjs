@@ -40,6 +40,9 @@ async function main() {
   console.error("\n=== Step 3: Scraping CVRD Board meetings ===\n");
   await run(join(ROOT, "scripts", "scrape-cvrd.mjs"));
 
+  console.error("\n=== Step 3b: Scraping Cumberland council meetings ===\n");
+  await run(join(ROOT, "scripts", "scrape-cumberland.mjs"));
+
   console.error("\n=== Step 4: Processing AI summaries ===\n");
   await run(join(ROOT, "scripts", "process-ai-summaries.mjs"));
 

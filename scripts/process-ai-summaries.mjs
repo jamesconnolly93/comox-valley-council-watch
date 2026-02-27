@@ -93,6 +93,7 @@ async function main() {
           tags: tags.length ? tags : null,
           is_significant: parsed.is_significant === true,
           impact: parsed.impact ?? null,
+          bylaw_number: parsed.bylaw_number ?? null,
           metadata: {
             ...(item.metadata || {}),
             ai_response: parsed,

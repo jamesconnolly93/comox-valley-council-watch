@@ -2,17 +2,7 @@
 
 import Link from "next/link";
 import type { FeedItem } from "@/lib/feed";
-import { formatMeetingDate } from "@/lib/feed";
-
-/** Only show impactful callouts; hide generic "no impact" variants */
-function isActionableImpact(impact: string): boolean {
-  if (!impact) return false;
-  const normalized = impact.trim().toLowerCase();
-  if (normalized.startsWith("no direct impact")) return false;
-  if (normalized.startsWith("no immediate impact")) return false;
-  if (normalized.startsWith("no impact")) return false;
-  return true;
-}
+import { formatMeetingDate, isActionableImpact, municipalityBadgeClass } from "@/lib/feed";
 
 function BoltIcon({ className }: { className?: string }) {
   return (
@@ -46,12 +36,7 @@ export function Highlights({ items }: { items: FeedItem[] }) {
           {items.map((item, idx) => {
             const shortName =
               item.meetings?.municipalities?.short_name ?? "Unknown";
-            const badgeClass =
-              shortName === "Courtenay"
-                ? "bg-blue-50 text-blue-700 border-blue-200"
-                : shortName === "Comox"
-                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                  : "bg-amber-50 text-amber-700 border-amber-200";
+            const badgeClass = municipalityBadgeClass(shortName);
 
             return (
               <Link

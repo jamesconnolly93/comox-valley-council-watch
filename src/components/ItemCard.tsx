@@ -1,22 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { FeedItem } from "@/lib/feed";
-import { categoryLabel } from "@/lib/feed";
+import { categoryLabel, isActionableImpact, formatMeetingDateShort, municipalityBadgeClass } from "@/lib/feed";
 import { useComplexity } from "@/lib/complexity-context";
 import { CommunityVoices } from "./CommunityVoices";
 
 const TAG_LIMIT = 5;
-
-/** Only show impactful callouts; hide generic "no impact" variants */
-function isActionableImpact(impact: string): boolean {
-  if (!impact) return false;
-  const normalized = impact.trim().toLowerCase();
-  if (normalized.startsWith("no direct impact")) return false;
-  if (normalized.startsWith("no immediate impact")) return false;
-  if (normalized.startsWith("no impact")) return false;
-  return true;
-}
 
 /** Humanize tag for display: development_cost_charges → Development Cost Charges */
 function formatTag(tag: string): string {
@@ -144,6 +135,25 @@ function StarIcon({ className }: { className?: string }) {
   );
 }
 
+function ShareIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+      <polyline points="16 6 12 2 8 6" />
+      <line x1="12" x2="12" y1="2" y2="15" />
+    </svg>
+  );
+}
+
 function getSummaryForComplexity(
   item: FeedItem,
   complexity: "simple" | "standard" | "expert"
@@ -169,12 +179,7 @@ export function ItemCard({
   const { complexity } = useComplexity();
   const shortName = item.meetings?.municipalities?.short_name ?? "Unknown";
 
-  const badgeClass =
-    shortName === "Courtenay"
-      ? "bg-blue-50 text-blue-700 border-blue-200"
-      : shortName === "Comox"
-        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-        : "bg-amber-50 text-amber-700 border-amber-200";
+  const badgeClass = municipalityBadgeClass(shortName);
 
   const categories = item.categories ?? (item.category ? [item.category] : []);
   const tags = item.tags ?? [];
@@ -244,6 +249,16 @@ export function ItemCard({
         {displaySummary}
       </p>
 
+      {item.bylawHistory && item.bylawHistory.length > 0 && (
+        <p className="mt-1.5 text-xs text-[var(--text-tertiary)]">
+          Also discussed:{" "}
+          {item.bylawHistory
+            .map((h) => formatMeetingDateShort(h.date))
+            .filter(Boolean)
+            .join(", ")}
+        </p>
+      )}
+
       {publicFeedback && (
         <CommunityVoices data={publicFeedback} />
       )}
@@ -312,12 +327,25 @@ export function ItemCard({
         </div>
       )}
 
-      {hasMore && (
-        <div className="mt-3 flex items-center gap-1 text-xs text-[var(--text-tertiary)]">
-          <ChevronIcon expanded={expanded} />
-          <span>{expanded ? "Collapse" : "Expand"}</span>
-        </div>
-      )}
+      <div className="mt-3 flex items-center justify-between">
+        {hasMore ? (
+          <div className="flex items-center gap-1 text-xs text-[var(--text-tertiary)]">
+            <ChevronIcon expanded={expanded} />
+            <span>{expanded ? "Collapse" : "Expand"}</span>
+          </div>
+        ) : (
+          <span />
+        )}
+        <Link
+          href={`/item/${item.id}`}
+          onClick={(e) => e.stopPropagation()}
+          className="flex items-center gap-1 text-xs text-[var(--text-tertiary)] hover:text-[var(--accent)] transition-colors"
+          title="Share this item"
+        >
+          <ShareIcon className="h-3.5 w-3.5" />
+          Share
+        </Link>
+      </div>
     </article>
   );
 }

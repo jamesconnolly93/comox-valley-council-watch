@@ -31,6 +31,9 @@ export type FeedItem = {
   impact: string | null;
   raw_content: string | null;
   is_significant: boolean | null;
+  bylaw_number?: string | null;
+  /** Populated server-side when older meetings discussed the same bylaw */
+  bylawHistory?: Array<{ date: string; meetingTitle: string | null; meetingId: string }>;
   meeting_id: string;
   public_feedback?: PublicFeedbackRow | null;
   meetings: {
@@ -56,6 +59,7 @@ export const MUNICIPALITIES = [
   { value: "Courtenay", label: "Courtenay" },
   { value: "Comox", label: "Comox" },
   { value: "CVRD", label: "CVRD" },
+  { value: "Cumberland", label: "Cumberland" },
 ] as const;
 
 export const CATEGORIES = [
@@ -72,9 +76,30 @@ export const CATEGORIES = [
   { value: "other", label: "Other" },
 ] as const;
 
+/** Tailwind classes for municipality badge pill */
+export function municipalityBadgeClass(shortName: string): string {
+  switch (shortName) {
+    case "Courtenay": return "bg-blue-50 text-blue-700 border-blue-200";
+    case "Comox": return "bg-emerald-50 text-emerald-700 border-emerald-200";
+    case "CVRD": return "bg-amber-50 text-amber-700 border-amber-200";
+    case "Cumberland": return "bg-violet-50 text-violet-700 border-violet-200";
+    default: return "bg-gray-50 text-gray-700 border-gray-200";
+  }
+}
+
 export function categoryLabel(slug: string): string {
   const c = CATEGORIES.find((x) => x.value === slug);
   return c?.label ?? slug;
+}
+
+/** Only show impactful callouts; hide generic "no impact" variants */
+export function isActionableImpact(impact: string | null | undefined): boolean {
+  if (!impact) return false;
+  const normalized = impact.trim().toLowerCase();
+  if (normalized.startsWith("no direct impact")) return false;
+  if (normalized.startsWith("no immediate impact")) return false;
+  if (normalized.startsWith("no impact")) return false;
+  return true;
 }
 
 export function groupItemsByMeeting(items: FeedItem[]): MeetingWithItems[] {
@@ -97,6 +122,18 @@ export function groupItemsByMeeting(items: FeedItem[]): MeetingWithItems[] {
       items: meetingItems,
     };
   });
+}
+
+/** Abbreviated date for inline use, e.g. "Jan 21" */
+export function formatMeetingDateShort(dateStr: string | undefined): string {
+  if (!dateStr) return "";
+  const datePart = dateStr.slice(0, 10);
+  const parts = datePart.split("-").map(Number);
+  if (parts.length !== 3 || parts.some(isNaN)) return "";
+  const [, month, day] = parts;
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  if (month < 1 || month > 12) return "";
+  return `${months[month - 1]} ${day}`;
 }
 
 /** Parse YYYY-MM-DD directly to avoid timezone conversion (e.g. 2026-02-18 → February 18, 2026) */

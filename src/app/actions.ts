@@ -2,7 +2,34 @@
 
 import { createClient } from "@/lib/supabase/server";
 import type { FeedItem, MeetingWithItems } from "@/lib/feed";
-import { groupItemsByMeeting } from "@/lib/feed";
+import { groupItemsByMeeting, isActionableImpact } from "@/lib/feed";
+
+/** Deduplicate bylaw items across meetings: keep most recent, attach history to it. */
+function applyBylawDeduplication(items: FeedItem[]): FeedItem[] {
+  const bylawGroups = new Map<string, FeedItem[]>();
+  for (const item of items) {
+    if (item.bylaw_number) {
+      const existing = bylawGroups.get(item.bylaw_number);
+      if (existing) existing.push(item);
+      else bylawGroups.set(item.bylaw_number, [item]);
+    }
+  }
+
+  const suppressedIds = new Set<string>();
+  for (const group of bylawGroups.values()) {
+    if (group.length < 2) continue;
+    // Items are already sorted date-desc, so group[0] is the most recent
+    const [mostRecent, ...older] = group;
+    mostRecent.bylawHistory = older.map((item) => ({
+      date: item.meetings?.date ?? "",
+      meetingTitle: item.meetings?.title ?? null,
+      meetingId: item.meeting_id,
+    }));
+    for (const item of older) suppressedIds.add(item.id);
+  }
+
+  return items.filter((item) => !suppressedIds.has(item.id));
+}
 
 export type FetchFilteredItemsResult = {
   groups: MeetingWithItems[];
@@ -57,6 +84,7 @@ export async function fetchFilteredItems(params: {
       raw_content,
       is_significant,
       categories,
+      bylaw_number,
       meeting_id,
       public_feedback (
         id,
@@ -118,6 +146,11 @@ export async function fetchFilteredItems(params: {
 
   const items = (data ?? []) as unknown as FeedItem[];
 
+  // Nullify non-actionable impact server-side so SSR HTML never contains them
+  for (const item of items) {
+    if (!isActionableImpact(item.impact)) item.impact = null;
+  }
+
   items.sort((a, b) => {
     const dateA = a.meetings?.date ?? "";
     const dateB = b.meetings?.date ?? "";
@@ -126,7 +159,13 @@ export async function fetchFilteredItems(params: {
     return 0;
   });
 
-  const groups = groupItemsByMeeting(items);
+  // Collapse older bylaw readings into the most recent card when viewing all municipalities
+  const deduped =
+    !params.municipality || params.municipality === "all"
+      ? applyBylawDeduplication(items)
+      : items;
+
+  const groups = groupItemsByMeeting(deduped);
 
   return { groups, dbEmpty: false };
 }
@@ -164,6 +203,11 @@ export async function getHighlights(limit = 5): Promise<HighlightItem[]> {
   if (!data || data.length < 3) return [];
 
   const items = data as unknown as HighlightItem[];
+
+  for (const item of items) {
+    if (!isActionableImpact(item.impact)) item.impact = null;
+  }
+
   items.sort((a, b) => {
     const dateA = a.meetings?.date ?? "";
     const dateB = b.meetings?.date ?? "";

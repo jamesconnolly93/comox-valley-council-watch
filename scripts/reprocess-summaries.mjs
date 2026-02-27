@@ -82,6 +82,7 @@ async function main() {
         summary_simple: parsed.summary_simple ?? null,
         summary_expert: parsed.summary_expert ?? null,
         impact: parsed.impact ?? null,
+        bylaw_number: parsed.bylaw_number ?? null,
       };
 
       if (dryRun) {

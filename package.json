@@ -13,6 +13,8 @@
     "scrape:comox:dry": "node scripts/scrape-comox.mjs --dry-run",
     "scrape:cvrd": "node scripts/scrape-cvrd.mjs",
     "scrape:cvrd:dry": "node scripts/scrape-cvrd.mjs --dry-run",
+    "scrape:cumberland": "node scripts/scrape-cumberland.mjs",
+    "scrape:cumberland:dry": "node scripts/scrape-cumberland.mjs --dry-run",
     "fix:categories": "node scripts/fix-categories.mjs",
     "test:ai": "node scripts/test-ai-pipeline.mjs",
     "test:decision": "node scripts/test-decision-extraction.mjs",
