@@ -6,7 +6,9 @@ import {
   groupItemsByMeeting,
   groupItemsByIssue,
   isActionableImpact,
+  isHighImpact,
   normaliseFeedback,
+  extractBylawFromTitle,
 } from "@/lib/feed";
 
 export type FetchFilteredItemsResult = {
@@ -159,6 +161,94 @@ export async function fetchFilteredItems(params: {
   const standaloneGroups = groupItemsByMeeting(standaloneItems);
 
   return { issueGroups, standaloneGroups, dbEmpty: false };
+}
+
+/** Score an item for spotlight selection */
+function spotlightScore(item: FeedItem, reactionCounts: Map<string, number>): number {
+  let score = 0;
+  const fb = normaliseFeedback(item.public_feedback);
+  if (fb?.feedback_count) score += fb.feedback_count;
+  score += (reactionCounts.get(item.id) ?? 0) * 5;
+  if (isHighImpact(item.impact)) score += 30;
+  return score;
+}
+
+/**
+ * Select the top 1-2 editorially significant items for the Spotlight section.
+ * Scored by: community letters + reactions×5 + high-impact bonus.
+ * Only items from the last 30 days; bylaw thread siblings deduplicated.
+ */
+export async function getSpotlightItems(limit = 2): Promise<FeedItem[]> {
+  const supabase = await createClient();
+
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 30);
+  const cutoffStr = cutoff.toISOString().slice(0, 10);
+
+  // Find recent meetings
+  const { data: recentMeetings } = await supabase
+    .from("meetings")
+    .select("id")
+    .gte("date", cutoffStr);
+
+  const meetingIds = (recentMeetings ?? []).map((m) => m.id);
+
+  const selectCols = `
+    id, title, summary, summary_simple, summary_expert,
+    impact, category, categories, bylaw_number, meeting_id,
+    public_feedback(id, feedback_count, sentiment_summary, support_count, oppose_count, neutral_count, positions),
+    meetings!inner(id, date, title, municipality_id,
+      municipalities(id, name, short_name)
+    )
+  `;
+
+  let query = supabase.from("items").select(selectCols).limit(300);
+  if (meetingIds.length > 0) {
+    query = query.in("meeting_id", meetingIds);
+  }
+
+  const { data } = await query;
+  if (!data?.length) return [];
+
+  const items = data as unknown as FeedItem[];
+
+  // Nullify non-actionable impacts
+  for (const item of items) {
+    if (!isActionableImpact(item.impact)) item.impact = null;
+  }
+
+  // Fetch reaction counts for scoring
+  const itemIds = items.map((i) => i.id);
+  const { data: reactions } = await supabase
+    .from("reactions")
+    .select("item_id")
+    .in("item_id", itemIds);
+
+  const reactionCounts = new Map<string, number>();
+  for (const r of reactions ?? []) {
+    reactionCounts.set(r.item_id, (reactionCounts.get(r.item_id) ?? 0) + 1);
+  }
+
+  // Sort by score descending
+  items.sort((a, b) => spotlightScore(b, reactionCounts) - spotlightScore(a, reactionCounts));
+
+  // Pick top N, deduplicating bylaw thread siblings
+  const selectedBylawKeys = new Set<string>();
+  const spotlight: FeedItem[] = [];
+
+  for (const item of items) {
+    if (spotlight.length >= limit) break;
+    const shortName = item.meetings?.municipalities?.short_name ?? "Unknown";
+    const bylawNum = item.bylaw_number || extractBylawFromTitle(item.title ?? "");
+    const bylawKey = bylawNum ? `${shortName}_${bylawNum}` : null;
+
+    if (bylawKey && selectedBylawKeys.has(bylawKey)) continue;
+    if (bylawKey) selectedBylawKeys.add(bylawKey);
+
+    spotlight.push(item);
+  }
+
+  return spotlight;
 }
 
 export type HighlightItem = FeedItem;

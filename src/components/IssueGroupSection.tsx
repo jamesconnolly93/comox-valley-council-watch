@@ -42,7 +42,7 @@ export function IssueGroupSection({ group }: { group: IssueGroup }) {
   const totalLetters = group.totalFeedbackCount;
 
   return (
-    <section className="border-l-2 border-amber-400/60 pl-4 sm:pl-6">
+    <section id={group.bylawKey} className="scroll-mt-24 border-l-2 border-amber-400/60 pl-4 sm:pl-6">
       <header className="mb-4">
         <div className="mb-1.5 flex flex-wrap items-center gap-2">
           <span className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">

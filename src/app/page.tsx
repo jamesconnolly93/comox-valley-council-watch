@@ -4,9 +4,8 @@ import { MeetingGroup } from "@/components/MeetingGroup";
 import { IssueGroupSection } from "@/components/IssueGroupSection";
 import { FeedSkeleton } from "@/components/FeedSkeleton";
 import { ComplexityProviderWrapper } from "@/components/ComplexityProviderWrapper";
-import { ComplexitySlider } from "@/components/ComplexitySlider";
-import { fetchFilteredItems, getHighlights } from "./actions";
-import { Highlights } from "@/components/Highlights";
+import { fetchFilteredItems, getSpotlightItems } from "./actions";
+import { Spotlight } from "@/components/Spotlight";
 import { DigestSignup } from "@/components/DigestSignup";
 
 export const metadata = {
@@ -165,10 +164,10 @@ export default async function HomePage({
     typeof params?.category === "string" ? params.category : null;
   const sort = typeof params?.sort === "string" ? params.sort : null;
 
-  const showHighlights =
+  const showSpotlight =
     (!municipality || municipality === "all") &&
     (!category || category === "all");
-  const highlights = showHighlights ? await getHighlights() : [];
+  const spotlightItems = showSpotlight ? await getSpotlightItems() : [];
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
@@ -199,7 +198,7 @@ export default async function HomePage({
         </div>
       </header>
 
-      <main className="relative mx-auto max-w-4xl px-5 pt-6 pb-20 sm:px-6 md:pb-8">
+      <main className="relative mx-auto max-w-4xl px-5 pt-6 pb-8 sm:px-6">
         <ComplexityProviderWrapper>
           <div className="space-y-6">
             {/* Sticky filter toolbar */}
@@ -213,10 +212,7 @@ export default async function HomePage({
               </Suspense>
             </div>
 
-            {/* Complexity segmented control — inline on desktop, floating on mobile */}
-            <ComplexitySlider />
-
-            {highlights.length > 0 && <Highlights items={highlights} />}
+            {spotlightItems.length > 0 && <Spotlight items={spotlightItems} />}
 
             <Suspense fallback={<FeedSkeleton />}>
               <FeedContent

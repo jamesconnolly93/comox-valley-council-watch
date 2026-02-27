@@ -6,6 +6,7 @@ import type { FeedItem } from "@/lib/feed";
 import {
   categoryLabel,
   isActionableImpact,
+  isHighImpact,
   municipalityBadgeClass,
   normaliseFeedback,
   deriveReadingStatus,
@@ -62,18 +63,6 @@ function cleanMeetingTitle(title: string): string {
     // Leading "– " or "- " remnants
     .replace(/^[–\-]\s*/, "")
     .trim();
-}
-
-/** True when impact text is personal/financial — drives the amber left border accent. */
-function isHighImpact(impact: string | null | undefined): boolean {
-  if (!impact) return false;
-  const t = impact.trim();
-  return (
-    t.startsWith("Your") ||
-    t.startsWith("If you") ||
-    t.includes("$") ||
-    t.includes("%")
-  );
 }
 
 // ---- Icons ----

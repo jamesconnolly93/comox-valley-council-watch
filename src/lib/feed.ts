@@ -107,6 +107,21 @@ export function categoryLabel(slug: string): string {
   return c?.label ?? slug;
 }
 
+/**
+ * True when impact text is personal or financial: starts with "Your"/"If you"
+ * or contains "$" or "%". Used to drive visual hierarchy and spotlight scoring.
+ */
+export function isHighImpact(impact: string | null | undefined): boolean {
+  if (!impact) return false;
+  const t = impact.trim();
+  return (
+    t.startsWith("Your") ||
+    t.startsWith("If you") ||
+    t.includes("$") ||
+    t.includes("%")
+  );
+}
+
 /** Only show impactful callouts; hide generic "no impact" variants */
 export function isActionableImpact(impact: string | null | undefined): boolean {
   if (!impact) return false;
