@@ -163,18 +163,6 @@ function LettersIcon({ className }: { className?: string }) {
   );
 }
 
-function statPillClass(type: KeyStat["type"]): string {
-  switch (type) {
-    case "money":
-      return "bg-emerald-50 text-emerald-700 border-emerald-200";
-    case "percentage":
-      return "bg-amber-50 text-amber-700 border-amber-200";
-    case "count":
-      return "bg-blue-50 text-blue-700 border-blue-200";
-    default:
-      return "bg-[var(--surface-elevated)] text-[var(--text-secondary)] border-[var(--border)]";
-  }
-}
 
 function communitySignalBadgeLabel(signal: CommunitySignal): string {
   const n = signal.participant_count;
@@ -194,11 +182,14 @@ export function ItemCard({
   item,
   showMeetingMeta = true,
   isThreadChild = false,
+  hideMunicipality = false,
 }: {
   item: FeedItem;
   /** @deprecated badge is always shown; kept for call-site compatibility */
   showMeetingMeta?: boolean;
   isThreadChild?: boolean;
+  /** Hide the municipality badge when the group header already identifies the municipality */
+  hideMunicipality?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const { complexity } = useComplexity();
@@ -261,13 +252,15 @@ export function ItemCard({
         }
         className="flex cursor-pointer flex-col gap-1 px-4 py-3 select-none"
       >
-        {/* Row 1: badge · title/date · [significant star] · [letters badge] · chevron */}
+        {/* Row 1: [badge] · title · [community badge] · chevron */}
         <div className="flex min-w-0 items-center gap-2">
-          <span
-            className={`inline-flex shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium ${badgeClass}`}
-          >
-            {shortName}
-          </span>
+          {!hideMunicipality && (
+            <span
+              className={`inline-flex shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium ${badgeClass}`}
+            >
+              {shortName}
+            </span>
+          )}
 
           <div className="min-w-0 flex-1 overflow-hidden">
             {isThreadChild ? (
@@ -314,19 +307,6 @@ export function ItemCard({
           </div>
         )}
 
-        {/* Row 3: key stats pills (collapsed — max 2) */}
-        {!isThreadChild && keyStats.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 pl-0.5">
-            {keyStats.slice(0, 2).map((stat, i) => (
-              <span
-                key={i}
-                className={`rounded-full border px-2 py-0.5 text-xs font-medium ${statPillClass(stat.type)}`}
-              >
-                {stat.value} {stat.label}
-              </span>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Expanded body — grid-row animation */}
@@ -354,6 +334,19 @@ export function ItemCard({
             >
               {displaySummary}
             </p>
+
+            {/* Key stats — quiet inline text, not colored pills */}
+            {!isThreadChild && keyStats.length > 0 && (
+              <p className="text-sm text-[var(--text-tertiary)]">
+                {keyStats.map((stat, i) => (
+                  <span key={i}>
+                    {i > 0 && <span className="mx-1.5 select-none">·</span>}
+                    <span className="font-medium text-[var(--text-secondary)]">{stat.value}</span>
+                    {" "}{stat.label}
+                  </span>
+                ))}
+              </p>
+            )}
 
             {/* Decision */}
             {item.decision && (

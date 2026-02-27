@@ -202,7 +202,7 @@ export default async function HomePage({
         <ComplexityProviderWrapper>
           <div className="space-y-6">
             {/* Sticky filter toolbar */}
-            <div className="sticky top-0 z-30 -mx-5 border-b border-[var(--border)] bg-[var(--background)] px-5 pt-3 pb-3 shadow-sm sm:-mx-6 sm:px-6">
+            <div className="sticky top-0 z-30 -mx-5 border-b border-[var(--border)] bg-[var(--background)]/95 px-5 pt-3 pb-3 backdrop-blur-sm sm:-mx-6 sm:px-6">
               <Suspense
                 fallback={
                   <div className="h-14 animate-pulse rounded-2xl bg-[var(--surface-elevated)]" />

@@ -10,7 +10,6 @@ import {
   extractBylawFromTitle,
 } from "@/lib/feed";
 import { useComplexity } from "@/lib/complexity-context";
-import { COMPLEXITY_LEVELS } from "./ComplexitySlider";
 import { StructuredFindings } from "./StructuredFindings";
 
 function getSummaryForComplexity(
@@ -79,33 +78,6 @@ function statPillClass(type: KeyStat["type"]): string {
   }
 }
 
-function ReadingLevelToggle() {
-  const { complexity, setComplexity } = useComplexity();
-  return (
-    <div className="flex items-center gap-2">
-      <span className="shrink-0 text-xs font-medium text-[var(--text-tertiary)]">
-        Reading level
-      </span>
-      <div className="flex rounded-full border border-amber-200/80 bg-white/60 p-0.5">
-        {COMPLEXITY_LEVELS.map((level) => (
-          <button
-            key={level.value}
-            type="button"
-            onClick={() => setComplexity(level.value)}
-            aria-pressed={complexity === level.value}
-            className={`rounded-full px-3 py-0.5 text-xs font-medium transition-all duration-150 ${
-              complexity === level.value
-                ? "bg-[var(--accent)] text-white shadow-sm"
-                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-            }`}
-          >
-            {level.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 function CommunityBar({ feedback }: { feedback: NonNullable<ReturnType<typeof normaliseFeedback>> }) {
   if (!feedback.feedback_count) return null;
@@ -341,12 +313,11 @@ export function Spotlight({ items }: { items: FeedItem[] }) {
   return (
     <section className="animate-fade-in">
       <div className="rounded-xl border border-amber-200/60 bg-amber-50/40">
-        {/* Header: label + reading level toggle */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-amber-200/40 px-4 py-3 sm:px-5">
+        {/* Header */}
+        <div className="border-b border-amber-200/40 px-4 py-3 sm:px-5">
           <h2 className="font-fraunces text-base font-semibold text-[var(--text-primary)]">
             Spotlight
           </h2>
-          <ReadingLevelToggle />
         </div>
 
         {/* Stories */}

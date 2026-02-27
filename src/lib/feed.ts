@@ -119,7 +119,7 @@ export const CATEGORIES = [
   { value: "finance", label: "Finance" },
   { value: "housing", label: "Housing" },
   { value: "environment", label: "Environment" },
-  { value: "parks_recreation", label: "Parks & Recreation" },
+  { value: "parks_recreation", label: "Parks & Rec" },
   { value: "governance", label: "Governance" },
   { value: "community", label: "Community" },
   { value: "safety", label: "Safety" },
@@ -367,6 +367,45 @@ export function formatMeetingDateMedium(dateStr: string | undefined): string {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   if (month < 1 || month > 12) return "";
   return `${months[month - 1]} ${day}, ${year}`;
+}
+
+const _MONTHS_RE = "(?:January|February|March|April|May|June|July|August|September|October|November|December)";
+
+/**
+ * Produce a short, clean meeting group header name from a meeting object.
+ * Strips date noise, normalises "meeting highlights" → "Highlights",
+ * and prepends the municipality short name if not already present.
+ * Examples:
+ *   "Courtenay Council meeting highlights for February 11, 2026" → "Courtenay Council Highlights"
+ *   "February 11, 2026 Strategic Planning Committee Meeting"     → "Comox Strategic Planning Committee Meeting"
+ *   "CVRD Board Meeting – February 24, 2026"                    → "CVRD Board Meeting"
+ *   "Council Meeting February 23, 2026"                         → "Cumberland Council Meeting"
+ */
+export function formatMeetingGroupHeader(meeting: FeedItem["meetings"]): string {
+  const title = meeting?.title ?? "";
+  const shortName = meeting?.municipalities?.short_name ?? "";
+
+  let cleaned = title
+    // Leading "Month DD, YYYY " prefix
+    .replace(new RegExp(`^${_MONTHS_RE}\\s+\\d{1,2}[,\\s]+\\d{4}\\s*`, "i"), "")
+    // Trailing " – Month DD, YYYY" or " - Month DD, YYYY"
+    .replace(new RegExp(`\\s*[–\\-]\\s*${_MONTHS_RE}\\s+\\d{1,2}[,\\s]+\\d{4}$`, "i"), "")
+    // " for Month DD, YYYY" anywhere (Courtenay highlights style)
+    .replace(new RegExp(`\\s*\\bfor\\s+${_MONTHS_RE}\\s+\\d{1,2}[,\\s]+\\d{4}\\b`, "i"), "")
+    // Trailing bare "Month DD, YYYY" (Cumberland/Comox: "Council Meeting February 23, 2026")
+    .replace(new RegExp(`\\s+${_MONTHS_RE}\\s+\\d{1,2}[,\\s]+\\d{4}$`, "i"), "")
+    // Normalise "meeting highlights" → "Highlights"
+    .replace(/\bmeeting highlights\b/gi, "Highlights")
+    .trim();
+
+  if (!cleaned) cleaned = "Council Meeting";
+
+  // Prepend municipality short name if not already present
+  if (shortName && !cleaned.toLowerCase().startsWith(shortName.toLowerCase())) {
+    cleaned = `${shortName} ${cleaned}`;
+  }
+
+  return cleaned;
 }
 
 /** Abbreviated date for inline use, e.g. "Jan 21" */

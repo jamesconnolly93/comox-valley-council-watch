@@ -3,11 +3,20 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useTransition } from "react";
 import { MUNICIPALITIES, CATEGORIES } from "@/lib/feed";
+import { useComplexity } from "@/lib/complexity-context";
+import type { Complexity } from "@/lib/complexity-context";
+
+const COMPLEXITY_LEVELS: { value: Complexity; label: string }[] = [
+  { value: "simple", label: "Simple" },
+  { value: "standard", label: "Standard" },
+  { value: "expert", label: "Expert" },
+];
 
 export function FilterBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+  const { complexity, setComplexity } = useComplexity();
 
   const municipality = searchParams.get("municipality") ?? "all";
   const category = searchParams.get("category") ?? "all";
@@ -68,10 +77,10 @@ export function FilterBar() {
         </div>
       </div>
 
-      {/* Row 2: Category — native select on mobile, scrollable chips on desktop */}
-      <div>
+      {/* Row 2: Category (left, flexible) + Reading level (right, fixed) */}
+      <div className="flex items-center gap-2">
         {/* Mobile: native select */}
-        <div className="relative md:hidden">
+        <div className="relative flex-1 md:hidden">
           <select
             value={category}
             onChange={(e) => updateParams({ category: e.target.value })}
@@ -88,8 +97,8 @@ export function FilterBar() {
           </div>
         </div>
 
-        {/* Desktop: scrollable chip strip with fade hint */}
-        <div className="relative hidden md:block">
+        {/* Desktop: scrollable chip strip */}
+        <div className="relative hidden flex-1 md:block">
           <div className="flex gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
             {CATEGORIES.map((c) => (
               <button
@@ -108,6 +117,28 @@ export function FilterBar() {
           </div>
           {/* Fade hint on right edge */}
           <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[var(--background)] to-transparent" />
+        </div>
+
+        {/* Reading level — right side, matches Sort toggle style */}
+        <div className="flex shrink-0 items-center gap-0.5 border-l border-[var(--border)] pl-3">
+          <span className="hidden pr-1 text-xs text-[var(--text-tertiary)] sm:block">
+            Level
+          </span>
+          {COMPLEXITY_LEVELS.map((level) => (
+            <button
+              key={level.value}
+              type="button"
+              onClick={() => setComplexity(level.value)}
+              aria-pressed={complexity === level.value}
+              className={`rounded px-2 py-1 text-xs transition-colors duration-150 ${
+                complexity === level.value
+                  ? "font-semibold text-[var(--text-primary)]"
+                  : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+              }`}
+            >
+              {level.label}
+            </button>
+          ))}
         </div>
       </div>
     </div>

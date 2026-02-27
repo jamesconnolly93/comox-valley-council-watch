@@ -1,42 +1,38 @@
 import { ItemCard } from "./ItemCard";
-import { formatMeetingDate, municipalityBadgeClass } from "@/lib/feed";
+import { formatMeetingGroupHeader, formatMeetingDateShort } from "@/lib/feed";
 import type { MeetingWithItems } from "@/lib/feed";
 
 export function MeetingGroup({ group }: { group: MeetingWithItems }) {
   const { meeting, items } = group;
-  const shortName = meeting?.municipalities?.short_name ?? "Unknown";
 
-  const badgeClass = municipalityBadgeClass(shortName);
+  const headerLabel = formatMeetingGroupHeader(meeting);
+  const dateLabel = formatMeetingDateShort(meeting?.date);
 
   return (
-    <section className="border-l-2 border-[var(--accent)] pl-4 sm:pl-6">
-      <header className="mb-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-          <span
-            className={`inline-flex w-fit rounded-full border px-2.5 py-0.5 text-xs font-medium ${badgeClass}`}
-          >
-            {shortName}
-          </span>
-          <h2 className="font-fraunces text-lg font-semibold text-[var(--text-primary)]">
-            {meeting?.title ?? "Regular Council Meeting"}
-          </h2>
-        </div>
-        <div className="flex items-center gap-3 text-sm text-[var(--text-tertiary)]">
-          <time
-            dateTime={meeting?.date}
-            className="font-fraunces font-medium text-[var(--text-secondary)]"
-          >
-            {formatMeetingDate(meeting?.date)}
-          </time>
-          <span>
-            {items.length} item{items.length === 1 ? "" : "s"} discussed
-          </span>
-        </div>
-      </header>
+    <section>
+      {/* Lightweight date-divider style header */}
+      <div className="mb-3 flex items-center gap-1.5 text-sm text-[var(--text-tertiary)]">
+        {dateLabel && (
+          <>
+            <time dateTime={meeting?.date} className="font-medium">
+              {dateLabel}
+            </time>
+            <span aria-hidden>·</span>
+          </>
+        )}
+        <span className="font-medium text-[var(--text-secondary)]">{headerLabel}</span>
+        <span aria-hidden>·</span>
+        <span>{items.length} item{items.length === 1 ? "" : "s"}</span>
+      </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {items.map((item) => (
-          <ItemCard key={item.id} item={item} showMeetingMeta={false} />
+          <ItemCard
+            key={item.id}
+            item={item}
+            showMeetingMeta={false}
+            hideMunicipality
+          />
         ))}
       </div>
     </section>
