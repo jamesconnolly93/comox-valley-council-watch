@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { FilterBar } from "@/components/FilterBar";
 import { MeetingGroup } from "@/components/MeetingGroup";
+import { IssueGroupSection } from "@/components/IssueGroupSection";
 import { FeedSkeleton } from "@/components/FeedSkeleton";
 import { ComplexityProviderWrapper } from "@/components/ComplexityProviderWrapper";
 import { fetchFilteredItems, getHighlights } from "./actions";
@@ -33,15 +34,18 @@ async function FeedContent({
   search,
   municipality,
   category,
+  sort,
 }: {
   search: string | null;
   municipality: string | null;
   category: string | null;
+  sort: string | null;
 }) {
-  const { groups, dbEmpty } = await fetchFilteredItems({
+  const { issueGroups, standaloneGroups, dbEmpty } = await fetchFilteredItems({
     search,
     municipality,
     category,
+    sort,
   });
 
   if (dbEmpty) {
@@ -66,7 +70,7 @@ async function FeedContent({
     );
   }
 
-  if (groups.length === 0) {
+  if (issueGroups.length === 0 && standaloneGroups.length === 0) {
     return (
       <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-6 py-16 text-center">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--accent-light)] text-[var(--accent)]">
@@ -87,11 +91,20 @@ async function FeedContent({
 
   return (
     <div className="space-y-10">
-      {groups.map((group, idx) => (
+      {issueGroups.map((group, idx) => (
+        <div
+          key={group.bylawKey}
+          className="animate-fade-in"
+          style={{ animationDelay: `${idx * 50}ms` }}
+        >
+          <IssueGroupSection group={group} />
+        </div>
+      ))}
+      {standaloneGroups.map((group, idx) => (
         <div
           key={group.meeting?.id ?? idx}
           className="animate-fade-in"
-          style={{ animationDelay: `${idx * 50}ms` }}
+          style={{ animationDelay: `${(issueGroups.length + idx) * 50}ms` }}
         >
           <MeetingGroup group={group} />
         </div>
@@ -149,6 +162,7 @@ export default async function HomePage({
     typeof params?.municipality === "string" ? params.municipality : null;
   const category =
     typeof params?.category === "string" ? params.category : null;
+  const sort = typeof params?.sort === "string" ? params.sort : null;
 
   const showHighlights =
     (!municipality || municipality === "all") &&
@@ -206,6 +220,7 @@ export default async function HomePage({
                 search={search}
                 municipality={municipality}
                 category={category}
+                sort={sort}
               />
             </Suspense>
           </div>

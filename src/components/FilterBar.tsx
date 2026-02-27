@@ -19,6 +19,7 @@ export function FilterBar() {
   const search = searchParams.get("search") ?? "";
   const municipality = searchParams.get("municipality") ?? "all";
   const category = searchParams.get("category") ?? "all";
+  const sort = searchParams.get("sort") ?? "recent";
 
   useEffect(() => {
     setSearchInput(searchParams.get("search") ?? "");
@@ -111,6 +112,24 @@ export function FilterBar() {
             ))}
           </div>
         </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-medium text-[var(--text-tertiary)]">Sort</span>
+        {(["recent", "hot"] as const).map((s) => (
+          <button
+            key={s}
+            type="button"
+            onClick={() => updateParams({ sort: s === "recent" ? "" : s })}
+            className={`rounded-full px-3 py-1.5 text-sm font-medium transition-all duration-150 capitalize ${
+              sort === s
+                ? "bg-[var(--accent)] text-white"
+                : "border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:border-[var(--accent)]/50 hover:bg-[var(--accent-light)]/30"
+            }`}
+          >
+            {s === "recent" ? "Recent" : "Most discussed"}
+          </button>
+        ))}
       </div>
 
       {isPending && (

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { FeedItem } from "@/lib/feed";
-import { categoryLabel, isActionableImpact, formatMeetingDateShort, municipalityBadgeClass } from "@/lib/feed";
+import { categoryLabel, isActionableImpact, municipalityBadgeClass } from "@/lib/feed";
 import { useComplexity } from "@/lib/complexity-context";
 import { CommunityVoices } from "./CommunityVoices";
 import { ReactionButton } from "./ReactionButton";
@@ -249,16 +249,6 @@ export function ItemCard({
       >
         {displaySummary}
       </p>
-
-      {item.bylawHistory && item.bylawHistory.length > 0 && (
-        <p className="mt-1.5 text-xs text-[var(--text-tertiary)]">
-          Also discussed:{" "}
-          {item.bylawHistory
-            .map((h) => formatMeetingDateShort(h.date))
-            .filter(Boolean)
-            .join(", ")}
-        </p>
-      )}
 
       <div className="mt-3" onClick={(e) => e.stopPropagation()}>
         <ReactionButton itemId={item.id} />

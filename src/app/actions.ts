@@ -1,51 +1,17 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import type { FeedItem, MeetingWithItems } from "@/lib/feed";
-import { groupItemsByMeeting, isActionableImpact } from "@/lib/feed";
-
-/**
- * Extract a bylaw number from a title string as a fallback when the
- * `bylaw_number` DB column hasn't been populated yet via AI reprocessing.
- * Handles patterns like "Bylaw No. 2056", "Bylaw No. 2056 –", "Bylaw 2025-3".
- */
-function extractBylawFromTitle(title: string): string | null {
-  const m = title.match(/Bylaw\s+No\.?\s*(\d[\w-]*)/i);
-  return m?.[1] ?? null;
-}
-
-/** Deduplicate bylaw items across meetings: keep most recent, attach history to it. */
-function applyBylawDeduplication(items: FeedItem[]): FeedItem[] {
-  const bylawGroups = new Map<string, FeedItem[]>();
-  for (const item of items) {
-    // Prefer the DB-populated bylaw_number; fall back to parsing the title so
-    // deduplication works even before AI reprocessing has run.
-    const key = item.bylaw_number || extractBylawFromTitle(item.title ?? "");
-    if (key) {
-      const existing = bylawGroups.get(key);
-      if (existing) existing.push(item);
-      else bylawGroups.set(key, [item]);
-    }
-  }
-
-  const suppressedIds = new Set<string>();
-  for (const group of bylawGroups.values()) {
-    if (group.length < 2) continue;
-    // Items are already sorted date-desc, so group[0] is the most recent
-    const [mostRecent, ...older] = group;
-    mostRecent.bylawHistory = older.map((item) => ({
-      date: item.meetings?.date ?? "",
-      meetingTitle: item.meetings?.title ?? null,
-      meetingId: item.meeting_id,
-    }));
-    for (const item of older) suppressedIds.add(item.id);
-  }
-
-  return items.filter((item) => !suppressedIds.has(item.id));
-}
+import type { FeedItem, IssueGroup, MeetingWithItems } from "@/lib/feed";
+import {
+  groupItemsByMeeting,
+  groupItemsByIssue,
+  isActionableImpact,
+  normaliseFeedback,
+} from "@/lib/feed";
 
 export type FetchFilteredItemsResult = {
-  groups: MeetingWithItems[];
+  issueGroups: IssueGroup[];
+  standaloneGroups: MeetingWithItems[];
   dbEmpty: boolean;
 };
 
@@ -53,6 +19,7 @@ export async function fetchFilteredItems(params: {
   search?: string | null;
   municipality?: string | null;
   category?: string | null;
+  sort?: string | null;
 }): Promise<FetchFilteredItemsResult> {
   const supabase = await createClient();
 
@@ -61,7 +28,7 @@ export async function fetchFilteredItems(params: {
     .select("*", { count: "exact", head: true });
 
   if (count === 0) {
-    return { groups: [], dbEmpty: true };
+    return { issueGroups: [], standaloneGroups: [], dbEmpty: true };
   }
 
   let meetingIds: string[] | null = null;
@@ -71,13 +38,13 @@ export async function fetchFilteredItems(params: {
       .select("id")
       .eq("short_name", params.municipality)
       .single();
-    if (!mun) return { groups: [], dbEmpty: false };
+    if (!mun) return { issueGroups: [], standaloneGroups: [], dbEmpty: false };
     const { data: meetings } = await supabase
       .from("meetings")
       .select("id")
       .eq("municipality_id", mun.id);
     meetingIds = (meetings ?? []).map((m) => m.id);
-    if (meetingIds.length === 0) return { groups: [], dbEmpty: false };
+    if (meetingIds.length === 0) return { issueGroups: [], standaloneGroups: [], dbEmpty: false };
   }
 
   let query = supabase
@@ -149,7 +116,6 @@ export async function fetchFilteredItems(params: {
   }
 
   if (params.category && params.category !== "all") {
-    // Match against categories array (all AI-assigned categories), not just primary category
     query = query.contains("categories", [params.category]);
   }
 
@@ -164,23 +130,35 @@ export async function fetchFilteredItems(params: {
     if (!isActionableImpact(item.impact)) item.impact = null;
   }
 
+  // Default sort: most recent meeting first
   items.sort((a, b) => {
     const dateA = a.meetings?.date ?? "";
     const dateB = b.meetings?.date ?? "";
-    const cmp = dateB.localeCompare(dateA);
-    if (cmp !== 0) return cmp;
-    return 0;
+    return dateB.localeCompare(dateA);
   });
 
-  // Collapse older bylaw readings into the most recent card when viewing all municipalities
-  const deduped =
-    !params.municipality || params.municipality === "all"
-      ? applyBylawDeduplication(items)
-      : items;
+  const { issueGroups, standaloneItems } = groupItemsByIssue(items);
 
-  const groups = groupItemsByMeeting(deduped);
+  // "Hot" sort: order by community engagement (public feedback count)
+  if (params.sort === "hot") {
+    issueGroups.sort(
+      (a, b) =>
+        b.totalFeedbackCount - a.totalFeedbackCount ||
+        b.latestDate.localeCompare(a.latestDate)
+    );
+    standaloneItems.sort((a, b) => {
+      const aCount = normaliseFeedback(a.public_feedback)?.feedback_count ?? 0;
+      const bCount = normaliseFeedback(b.public_feedback)?.feedback_count ?? 0;
+      return (
+        bCount - aCount ||
+        (b.meetings?.date ?? "").localeCompare(a.meetings?.date ?? "")
+      );
+    });
+  }
 
-  return { groups, dbEmpty: false };
+  const standaloneGroups = groupItemsByMeeting(standaloneItems);
+
+  return { issueGroups, standaloneGroups, dbEmpty: false };
 }
 
 export type HighlightItem = FeedItem;

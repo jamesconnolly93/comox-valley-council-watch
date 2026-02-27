@@ -32,10 +32,8 @@ export type FeedItem = {
   raw_content: string | null;
   is_significant: boolean | null;
   bylaw_number?: string | null;
-  /** Populated server-side when older meetings discussed the same bylaw */
-  bylawHistory?: Array<{ date: string; meetingTitle: string | null; meetingId: string }>;
   meeting_id: string;
-  public_feedback?: PublicFeedbackRow | null;
+  public_feedback?: PublicFeedbackRow | PublicFeedbackRow[] | null;
   meetings: {
     id: string;
     date: string;
@@ -47,6 +45,23 @@ export type FeedItem = {
       short_name: string;
     } | null;
   } | null;
+};
+
+/** A bylaw/topic that has appeared in 2+ meetings — the "issue thread". */
+export type IssueGroup = {
+  /** Namespaced key: "{shortName}_{bylawNum}" */
+  bylawKey: string;
+  /** Bare bylaw number for display (e.g. "2056") */
+  bylawNum: string;
+  /** Title from the most recent item */
+  title: string;
+  /** All items, sorted date descending */
+  items: FeedItem[];
+  latestDate: string;
+  /** All municipalities that discussed this bylaw (deduped) */
+  municipalities: string[];
+  /** Total public letters/feedback across all items in thread */
+  totalFeedbackCount: number;
 };
 
 export type MeetingWithItems = {
@@ -80,10 +95,10 @@ export const CATEGORIES = [
 export function municipalityBadgeClass(shortName: string): string {
   switch (shortName) {
     case "Courtenay": return "bg-blue-50 text-blue-700 border-blue-200";
-    case "Comox": return "bg-emerald-50 text-emerald-700 border-emerald-200";
-    case "CVRD": return "bg-amber-50 text-amber-700 border-amber-200";
-    case "Cumberland": return "bg-violet-50 text-violet-700 border-violet-200";
-    default: return "bg-gray-50 text-gray-700 border-gray-200";
+    case "Comox":     return "bg-emerald-50 text-emerald-700 border-emerald-200";
+    case "CVRD":      return "bg-amber-50 text-amber-700 border-amber-200";
+    case "Cumberland":return "bg-violet-50 text-violet-700 border-violet-200";
+    default:          return "bg-gray-50 text-gray-700 border-gray-200";
   }
 }
 
@@ -100,6 +115,88 @@ export function isActionableImpact(impact: string | null | undefined): boolean {
   if (normalized.startsWith("no immediate impact")) return false;
   if (normalized.startsWith("no impact")) return false;
   return true;
+}
+
+/**
+ * Extract a bare bylaw number from a title string.
+ * Handles: "Bylaw No. 2056", "Bylaw No. 2056 –", "Bylaw 2025-3"
+ */
+export function extractBylawFromTitle(title: string): string | null {
+  const m = title.match(/Bylaw\s+No\.?\s*(\d[\w-]*)/i);
+  return m?.[1] ?? null;
+}
+
+/** Helper to normalise public_feedback regardless of whether it's array or object */
+export function normaliseFeedback(
+  pf: FeedItem["public_feedback"]
+): PublicFeedbackRow | null {
+  if (!pf) return null;
+  return Array.isArray(pf) ? (pf[0] ?? null) : pf;
+}
+
+/**
+ * Separate items into issue threads (bylaw appears in 2+ meetings) and
+ * standalone items (no bylaw match or only one meeting for that bylaw).
+ * Bylaws are scoped per municipality so e.g. Comox Bylaw 50 ≠ Courtenay Bylaw 50.
+ */
+export function groupItemsByIssue(items: FeedItem[]): {
+  issueGroups: IssueGroup[];
+  standaloneItems: FeedItem[];
+} {
+  const bylawMap = new Map<string, FeedItem[]>();
+
+  for (const item of items) {
+    const shortName = item.meetings?.municipalities?.short_name ?? "Unknown";
+    const bylawNum = item.bylaw_number || extractBylawFromTitle(item.title ?? "");
+    if (!bylawNum) continue;
+    const key = `${shortName}_${bylawNum}`;
+    const existing = bylawMap.get(key);
+    if (existing) existing.push(item);
+    else bylawMap.set(key, [item]);
+  }
+
+  const threadedIds = new Set<string>();
+  const issueGroups: IssueGroup[] = [];
+
+  for (const [bylawKey, groupItems] of bylawMap.entries()) {
+    if (groupItems.length < 2) continue; // single occurrence → standalone
+
+    groupItems.sort(
+      (a, b) => (b.meetings?.date ?? "").localeCompare(a.meetings?.date ?? "")
+    );
+
+    const mostRecent = groupItems[0];
+    const municipalities = [
+      ...new Set(
+        groupItems.map((i) => i.meetings?.municipalities?.short_name ?? "Unknown")
+      ),
+    ];
+    const totalFeedbackCount = groupItems.reduce((sum, item) => {
+      const pf = normaliseFeedback(item.public_feedback);
+      return sum + (pf?.feedback_count ?? 0);
+    }, 0);
+
+    const bylawNum = bylawKey.replace(/^[^_]+_/, "");
+
+    issueGroups.push({
+      bylawKey,
+      bylawNum,
+      title: mostRecent.title,
+      items: groupItems,
+      latestDate: mostRecent.meetings?.date ?? "",
+      municipalities,
+      totalFeedbackCount,
+    });
+
+    for (const item of groupItems) threadedIds.add(item.id);
+  }
+
+  // Sort issue groups: most recently active first
+  issueGroups.sort((a, b) => b.latestDate.localeCompare(a.latestDate));
+
+  const standaloneItems = items.filter((item) => !threadedIds.has(item.id));
+
+  return { issueGroups, standaloneItems };
 }
 
 export function groupItemsByMeeting(items: FeedItem[]): MeetingWithItems[] {
@@ -144,18 +241,8 @@ export function formatMeetingDate(dateStr: string | undefined): string {
   if (parts.length !== 3 || parts.some(isNaN)) return "";
   const [year, month, day] = parts;
   const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
   ];
   if (month < 1 || month > 12) return "";
   return `${months[month - 1]} ${day}, ${year}`;
