@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { FeedItem } from "@/lib/feed";
+import type { KeyStat, CommunitySignal } from "@/lib/feed";
 import {
   categoryLabel,
   isActionableImpact,
@@ -11,6 +12,7 @@ import {
   normaliseFeedback,
   deriveReadingStatus,
   formatMeetingDateMedium,
+  cleanItemTitle,
 } from "@/lib/feed";
 import { useComplexity } from "@/lib/complexity-context";
 import { CommunityVoices } from "./CommunityVoices";
@@ -123,19 +125,6 @@ function UserIcon({ className }: { className?: string }) {
   );
 }
 
-function StarIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      className={className}
-    >
-      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-    </svg>
-  );
-}
-
 function ShareIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -173,6 +162,32 @@ function LettersIcon({ className }: { className?: string }) {
   );
 }
 
+function statPillClass(type: KeyStat["type"]): string {
+  switch (type) {
+    case "money":
+      return "bg-emerald-50 text-emerald-700 border-emerald-200";
+    case "percentage":
+      return "bg-amber-50 text-amber-700 border-amber-200";
+    case "count":
+      return "bg-blue-50 text-blue-700 border-blue-200";
+    default:
+      return "bg-[var(--surface-elevated)] text-[var(--text-secondary)] border-[var(--border)]";
+  }
+}
+
+function communitySignalBadgeLabel(signal: CommunitySignal): string {
+  const n = signal.participant_count;
+  switch (signal.type) {
+    case "letters": return n ? `${n} letters` : "Community letters";
+    case "survey": return n ? `${n} survey responses` : "Survey";
+    case "delegation": return n ? `${n} delegation${n === 1 ? "" : "s"}` : "Delegation";
+    case "petition": return n ? `${n} petition signatures` : "Petition";
+    case "public_hearing": return n ? `${n} at public hearing` : "Public hearing";
+    case "engagement": return n ? `${n} participants` : "Community engagement";
+    default: return n ? `${n} responses` : "Community input";
+  }
+}
+
 export function ItemCard({
   item,
   showMeetingMeta = true,
@@ -189,11 +204,14 @@ export function ItemCard({
   const badgeClass = municipalityBadgeClass(shortName);
   const feedback = normaliseFeedback(item.public_feedback);
   const feedbackCount = feedback?.feedback_count ?? 0;
+  const hasFeedback = feedbackCount > 0;
 
   const categories = item.categories ?? (item.category ? [item.category] : []);
   const tags = item.tags ?? [];
   const visibleTags = tags.slice(0, TAG_LIMIT);
   const remaining = tags.length - TAG_LIMIT;
+  const keyStats: KeyStat[] = Array.isArray(item.key_stats) ? item.key_stats : [];
+  const communitySignal: CommunitySignal | null = item.community_signal ?? null;
 
   const displaySummary = getSummaryForComplexity(item, complexity);
   const impactText = isActionableImpact(item.impact) ? item.impact!.trim() : null;
@@ -212,6 +230,9 @@ export function ItemCard({
   const threadPrimaryLabel = cleanedMeetingTitle
     ? `${formatMeetingDateMedium(item.meetings?.date)} — ${cleanedMeetingTitle}`
     : formatMeetingDateMedium(item.meetings?.date);
+
+  // Card title: strip "Bylaw No. XXXX – " prefix from item title in regular cards
+  const displayTitle = isThreadChild ? item.title : cleanItemTitle(item.title);
 
   // Border: amber left accent for high-impact, subtle amber all-around for is_significant
   const borderClass = highImpact
@@ -251,20 +272,23 @@ export function ItemCard({
               </span>
             ) : (
               <h3 className="truncate font-fraunces text-base font-semibold leading-snug text-[var(--text-primary)]">
-                {item.title}
+                {displayTitle}
               </h3>
             )}
           </div>
-
-          {item.is_significant && !isThreadChild && (
-            <StarIcon className="h-3.5 w-3.5 shrink-0 text-amber-400" />
-          )}
 
           {/* Community letters badge — warm pill, visible at a glance */}
           {feedbackCount > 0 && (
             <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
               <LettersIcon className="h-3 w-3" />
               {feedbackCount}
+            </span>
+          )}
+
+          {/* Community signal badge (lightweight — shown when no full public_feedback) */}
+          {!hasFeedback && !isThreadChild && communitySignal?.participant_count && (
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
+              {communitySignalBadgeLabel(communitySignal)}
             </span>
           )}
 
@@ -283,6 +307,20 @@ export function ItemCard({
             >
               {collapsedSubtitle}
             </span>
+          </div>
+        )}
+
+        {/* Row 3: key stats pills (collapsed — max 2) */}
+        {!isThreadChild && keyStats.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pl-0.5">
+            {keyStats.slice(0, 2).map((stat, i) => (
+              <span
+                key={i}
+                className={`rounded-full border px-2 py-0.5 text-xs font-medium ${statPillClass(stat.type)}`}
+              >
+                {stat.value} {stat.label}
+              </span>
+            ))}
           </div>
         )}
       </div>
@@ -330,13 +368,41 @@ export function ItemCard({
               </div>
             )}
 
+            {/* Full key stats (expanded — all stats) */}
+            {!isThreadChild && keyStats.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {keyStats.map((stat, i) => (
+                  <span
+                    key={i}
+                    className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${statPillClass(stat.type)}`}
+                  >
+                    {stat.value} {stat.label}
+                  </span>
+                ))}
+              </div>
+            )}
+
             {/* Reaction button */}
             <div onClick={(e) => e.stopPropagation()}>
               <ReactionButton itemId={item.id} />
             </div>
 
-            {/* Community Voices — above tags so it's prominent */}
+            {/* Community Voices (full, from public_feedback pipeline) */}
             {feedback && <CommunityVoices data={feedback} />}
+
+            {/* Community Signal (lightweight, from AI extraction — shown when no full feedback) */}
+            {!hasFeedback && communitySignal?.summary && (
+              <div className="rounded-r-lg border-l-2 border-blue-200 bg-blue-50/50 py-2 pl-3 pr-3">
+                <p className="text-xs font-medium text-blue-700">
+                  {communitySignal.participant_count
+                    ? communitySignalBadgeLabel(communitySignal)
+                    : "Community input"}
+                </p>
+                <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
+                  {communitySignal.summary}
+                </p>
+              </div>
+            )}
 
             {/* Category + tag pills */}
             {(categories.length > 0 || tags.length > 0) && (

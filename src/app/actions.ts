@@ -59,6 +59,10 @@ export async function fetchFilteredItems(params: {
       summary,
       summary_simple,
       summary_expert,
+      headline,
+      topic_label,
+      key_stats,
+      community_signal,
       category,
       tags,
       decision,
@@ -195,6 +199,7 @@ export async function getSpotlightItems(limit = 2): Promise<FeedItem[]> {
 
   const selectCols = `
     id, title, summary, summary_simple, summary_expert,
+    headline, topic_label, key_stats, community_signal,
     impact, category, categories, bylaw_number, meeting_id,
     public_feedback(id, feedback_count, sentiment_summary, support_count, oppose_count, neutral_count, positions),
     meetings!inner(id, date, title, municipality_id,
@@ -258,8 +263,9 @@ export async function getHighlights(limit = 5): Promise<HighlightItem[]> {
   const supabase = await createClient();
 
   const selectCols = `
-    id, title, summary, summary_simple, summary_expert, impact, category, categories,
-    is_significant, meeting_id,
+    id, title, summary, summary_simple, summary_expert,
+    headline, topic_label, key_stats, community_signal,
+    impact, category, categories, is_significant, meeting_id,
     meetings!inner(id, date, title, municipality_id,
       municipalities(id, name, short_name)
     )

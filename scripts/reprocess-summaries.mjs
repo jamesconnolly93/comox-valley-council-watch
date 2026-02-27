@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * Backfill summary_simple and summary_expert for complexity slider.
- * Uses full AI prompt; updates summary_simple, summary_expert, impact.
- * Keeps existing summary unchanged (already good).
+ * Backfill/reprocess AI-generated fields for all items.
+ * By default only processes items where headline IS NULL (i.e., not yet processed
+ * with the new prompt). Use --force to reprocess every item regardless.
  *
- * Usage: node scripts/reprocess-summaries.mjs [--dry-run]
- * Env: LIMIT=N (default: all items with summary)
+ * Usage: node scripts/reprocess-summaries.mjs [--dry-run] [--force]
+ * Env: LIMIT=N (default: all eligible items)
  */
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -23,6 +23,7 @@ const limit = parseInt(process.env.LIMIT || "9999", 10);
 
 async function main() {
   const dryRun = process.argv.includes("--dry-run");
+  const force = process.argv.includes("--force");
   loadEnv();
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -30,16 +31,29 @@ async function main() {
 
   const supabase = createAdminClient();
 
-  const { data: items, error } = await supabase
+  // By default, only reprocess items that haven't yet received a headline
+  // (i.e., were processed before the new prompt was added).
+  // --force reprocesses everything.
+  let query = supabase
     .from("items")
     .select("id, title, raw_content, description, decision")
     .not("summary", "is", null)
     .order("created_at", { ascending: true })
     .limit(limit);
 
+  if (!force) {
+    query = query.is("headline", null);
+  }
+
+  const { data: items, error } = await query;
+
   if (error) throw new Error(`Query failed: ${error.message}`);
   if (!items?.length) {
-    console.error("No items with summary. Nothing to process.");
+    console.error(
+      force
+        ? "No items with summary found. Nothing to process."
+        : "No items with headline IS NULL. All items already processed. Use --force to reprocess."
+    );
     return;
   }
 
@@ -48,17 +62,17 @@ async function main() {
   let failed = 0;
 
   console.error(
-    `Processing ${items.length} items for summary levels${dryRun ? " (dry-run)" : ""}...`
+    `Processing ${items.length} items${force ? " (--force)" : " (headline IS NULL)"}${dryRun ? " (dry-run)" : ""}...`
   );
 
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
-    console.error(`[${i + 1}/${items.length}] ${item.title?.slice(0, 50)}...`);
+    console.error(`[${i + 1}/${items.length}] ${item.title?.slice(0, 60)}...`);
 
     try {
       const response = await client.messages.create({
         model: MODEL,
-        max_tokens: 1024,
+        max_tokens: 2048,
         system: SYSTEM_PROMPT,
         messages: [
           {
@@ -83,13 +97,21 @@ async function main() {
         summary_expert: parsed.summary_expert ?? null,
         impact: parsed.impact ?? null,
         bylaw_number: parsed.bylaw_number ?? null,
+        headline: parsed.headline ?? null,
+        topic_label: parsed.topic_label ?? null,
+        key_stats: Array.isArray(parsed.key_stats) ? parsed.key_stats : [],
+        community_signal: parsed.community_signal ?? null,
       };
 
       if (dryRun) {
         console.error("  → Would update:", {
+          headline: updates.headline,
+          topic_label: updates.topic_label,
+          key_stats: updates.key_stats,
+          community_signal: updates.community_signal
+            ? `{type:${updates.community_signal.type}, count:${updates.community_signal.participant_count}}`
+            : null,
           summary_simple: updates.summary_simple?.slice(0, 60) + "...",
-          summary_expert: updates.summary_expert?.slice(0, 60) + "...",
-          impact: updates.impact?.slice(0, 50) + "...",
         });
       } else {
         await supabase.from("items").update(updates).eq("id", item.id);

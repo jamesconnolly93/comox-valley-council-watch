@@ -55,7 +55,7 @@ async function main() {
     try {
       const response = await client.messages.create({
         model: MODEL,
-        max_tokens: 1024,
+        max_tokens: 2048,
         system: SYSTEM_PROMPT,
         messages: [{ role: "user", content: buildUserMessage(item) }],
       });
@@ -88,6 +88,10 @@ async function main() {
           summary: parsed.summary ?? null,
           summary_simple: parsed.summary_simple ?? null,
           summary_expert: parsed.summary_expert ?? null,
+          headline: parsed.headline ?? null,
+          topic_label: parsed.topic_label ?? null,
+          key_stats: Array.isArray(parsed.key_stats) ? parsed.key_stats : [],
+          community_signal: parsed.community_signal ?? null,
           category: primaryCategory,
           categories: cats.length ? cats : null,
           tags: tags.length ? tags : null,

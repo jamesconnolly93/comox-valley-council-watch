@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { FeedItem } from "@/lib/feed";
+import type { FeedItem, KeyStat, CommunitySignal } from "@/lib/feed";
 import {
   isHighImpact,
   isActionableImpact,
@@ -28,6 +28,27 @@ function getSummaryForComplexity(
 function firstSentence(text: string): string {
   const m = text.match(/^[^.!?]+[.!?]/);
   return m ? m[0].trim() : text.slice(0, 160).trim();
+}
+
+/** Derive the static editorial headline with fallback chain */
+function deriveHeadline(item: FeedItem): string {
+  if (item.headline?.trim()) return item.headline.trim();
+  const impactText = isActionableImpact(item.impact) ? item.impact!.trim() : null;
+  if (impactText) return impactText;
+  return firstSentence(item.summary ?? item.description?.slice(0, 200) ?? item.title ?? "");
+}
+
+function statPillClass(type: KeyStat["type"]): string {
+  switch (type) {
+    case "money":
+      return "bg-emerald-50 text-emerald-700 border-emerald-200";
+    case "percentage":
+      return "bg-amber-50 text-amber-700 border-amber-200";
+    case "count":
+      return "bg-blue-50 text-blue-700 border-blue-200";
+    default:
+      return "bg-[var(--surface-elevated)] text-[var(--text-secondary)] border-[var(--border)]";
+  }
 }
 
 function ReadingLevelToggle() {
@@ -58,9 +79,8 @@ function ReadingLevelToggle() {
   );
 }
 
-function CommunityBar({ item }: { item: FeedItem }) {
-  const feedback = normaliseFeedback(item.public_feedback);
-  if (!feedback?.feedback_count) return null;
+function CommunityBar({ feedback }: { feedback: NonNullable<ReturnType<typeof normaliseFeedback>> }) {
+  if (!feedback.feedback_count) return null;
 
   const total =
     (feedback.support_count ?? 0) +
@@ -96,9 +116,7 @@ function CommunityBar({ item }: { item: FeedItem }) {
           {feedback.feedback_count} community letters
         </span>
         {dominant && (
-          <span className="text-xs text-[var(--text-tertiary)]">
-            — {dominant}
-          </span>
+          <span className="text-xs text-[var(--text-tertiary)]">— {dominant}</span>
         )}
       </div>
 
@@ -155,10 +173,7 @@ function CommunityBar({ item }: { item: FeedItem }) {
                   {pos.stance}
                 </span>
                 {pos.count > 0 && (
-                  <span className="text-[var(--text-tertiary)]">
-                    {" "}
-                    (~{pos.count})
-                  </span>
+                  <span className="text-[var(--text-tertiary)]"> (~{pos.count})</span>
                 )}
               </span>
             </li>
@@ -169,28 +184,52 @@ function CommunityBar({ item }: { item: FeedItem }) {
   );
 }
 
+function LightweightSignal({ signal }: { signal: CommunitySignal }) {
+  if (!signal.summary) return null;
+  return (
+    <div className="mt-3">
+      <p className="text-sm text-[var(--text-secondary)]">
+        <span className="font-medium text-[var(--text-primary)]">
+          {signal.participant_count ? `${signal.participant_count} ` : ""}
+          {signal.type === "survey"
+            ? "survey respondents"
+            : signal.type === "delegation"
+            ? "delegations"
+            : signal.type === "petition"
+            ? "petition signatures"
+            : "participants"}
+          :
+        </span>{" "}
+        {signal.summary}
+      </p>
+    </div>
+  );
+}
+
 function SpotlightStory({ item }: { item: FeedItem }) {
   const { complexity } = useComplexity();
 
   const shortName = item.meetings?.municipalities?.short_name ?? "Unknown";
   const badgeClass = municipalityBadgeClass(shortName);
-  const summary = getSummaryForComplexity(item, complexity);
-  const headline = firstSentence(summary);
+
+  const headline = deriveHeadline(item);
+  const summaryExcerpt = firstSentence(getSummaryForComplexity(item, complexity));
 
   const bylawNum = item.bylaw_number || extractBylawFromTitle(item.title ?? "");
   const anchor = bylawNum ? `#${shortName}_${bylawNum}` : `#${item.id}`;
   const ctaLabel = bylawNum ? "Read full thread" : "Read more";
 
-  const impactText = isActionableImpact(item.impact)
-    ? item.impact!.trim()
-    : null;
-  const highImpact = isHighImpact(item.impact);
+  const topicLabel =
+    item.topic_label ??
+    (bylawNum ? `Bylaw ${bylawNum}` : null) ??
+    (item.categories?.[0] ? categoryLabel(item.categories[0]) : null);
 
+  const keyStats: KeyStat[] = Array.isArray(item.key_stats) ? item.key_stats : [];
   const feedback = normaliseFeedback(item.public_feedback);
-  const hasCommunitySignal = (feedback?.feedback_count ?? 0) > 0;
-
-  const catLabel =
-    item.categories?.[0] ? categoryLabel(item.categories[0]) : null;
+  const hasFeedback = (feedback?.feedback_count ?? 0) > 0;
+  const signal: CommunitySignal | null = item.community_signal ?? null;
+  const highImpact = isHighImpact(item.impact);
+  const impactText = isActionableImpact(item.impact) ? item.impact!.trim() : null;
 
   return (
     <div className="px-4 py-4 sm:px-5">
@@ -201,34 +240,51 @@ function SpotlightStory({ item }: { item: FeedItem }) {
         >
           {shortName}
         </span>
-        {bylawNum && (
-          <span className="inline-flex rounded-full border border-amber-200 bg-amber-100/60 px-2 py-0.5 text-xs font-medium text-amber-700">
-            Bylaw {bylawNum}
+        {topicLabel && (
+          <span className="text-xs font-medium text-[var(--text-tertiary)]">
+            {topicLabel}
           </span>
-        )}
-        {!bylawNum && catLabel && (
-          <span className="text-xs text-[var(--text-tertiary)]">{catLabel}</span>
         )}
       </div>
 
-      {/* Headline */}
-      <h3
-        key={complexity}
-        className="font-fraunces text-base font-semibold leading-snug text-[var(--text-primary)]"
-        style={{ animation: "fade-in 0.15s ease-out" }}
-      >
+      {/* Headline — static, editorial, never changes with reading level */}
+      <h3 className="font-fraunces text-lg font-semibold leading-snug text-[var(--text-primary)]">
         {headline}
       </h3>
 
-      {/* Impact callout — only for high-impact items without community letters */}
-      {highImpact && !hasCommunitySignal && impactText && (
-        <p className="mt-2 text-sm font-medium text-[var(--accent)]">
-          {impactText}
-        </p>
+      {/* Summary excerpt — changes with reading level */}
+      <p
+        key={complexity}
+        className="mt-1 text-sm leading-relaxed text-[var(--text-secondary)]"
+        style={{ animation: "fade-in 0.15s ease-out" }}
+      >
+        {summaryExcerpt}
+      </p>
+
+      {/* Key stats pills */}
+      {keyStats.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {keyStats.map((stat, i) => (
+            <span
+              key={i}
+              className={`rounded-full border px-2 py-0.5 text-xs font-medium ${statPillClass(stat.type)}`}
+            >
+              {stat.value} {stat.label}
+            </span>
+          ))}
+        </div>
       )}
 
-      {/* Community bar — replaces impact callout when there are letters */}
-      {hasCommunitySignal && <CommunityBar item={item} />}
+      {/* Impact callout — only for high-impact items without community letters */}
+      {highImpact && !hasFeedback && !signal && impactText && (
+        <p className="mt-2 text-sm font-medium text-[var(--accent)]">{impactText}</p>
+      )}
+
+      {/* Community bar (full, from public_feedback pipeline) */}
+      {hasFeedback && feedback && <CommunityBar feedback={feedback} />}
+
+      {/* Lightweight community signal (from AI extraction) */}
+      {!hasFeedback && signal && <LightweightSignal signal={signal} />}
 
       {/* CTA */}
       <div className="mt-3">

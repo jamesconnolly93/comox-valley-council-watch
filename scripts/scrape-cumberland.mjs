@@ -289,7 +289,26 @@ function parseBylaw(block) {
   if (!bylawMatch) return null;
 
   const num = bylawMatch[1].trim();
-  const name = bylawMatch[2].trim().replace(/[–\-]+$/, "").trim();
+
+  // Clean the name: strip leading punctuation/whitespace and trailing dashes
+  let name = bylawMatch[2].trim().replace(/^[,.\s–\-]+/, "").replace(/[–\-]+$/, "").trim();
+
+  // Reject garbled names that are just date fragments (e.g. ", 2026" or "2012 until...")
+  // A valid bylaw name must contain at least 3 consecutive alphabetical characters
+  const hasAlpha = /[a-zA-Z]{3}/.test(name);
+  if (!hasAlpha || name.length < 5) {
+    // Try a broader pattern: skip past the first line and look for a descriptive name
+    const altMatch = block.match(
+      /Bylaw No\.?\s*\d+[\w-]*[^\n]*\n+\s*([A-Za-z][^\n]{5,80})/i
+    );
+    if (altMatch) {
+      name = altMatch[1].trim().replace(/[–\-]+$/, "").trim();
+    }
+    if (!name || !/[a-zA-Z]{3}/.test(name) || name.length < 5) return null;
+  }
+
+  // Strip trailing year-only or "Bylaw No. XXXX" suffixes that crept into the name
+  name = name.replace(/\s*,?\s*\d{4}\s*$/, "").trim();
   if (!name || name.length < 5) return null;
 
   const title = `Bylaw No. ${num} – ${name}`;

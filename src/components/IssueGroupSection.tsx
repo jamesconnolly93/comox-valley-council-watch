@@ -16,7 +16,7 @@ function threadSummaryLine(group: IssueGroup): string {
   if (span >= 1) {
     return `${count} reading${count === 1 ? "" : "s"} across ${span} month${span === 1 ? "" : "s"}`;
   }
-  return `Discussed at ${count} meeting${count === 1 ? "" : "s"}`;
+  return `${count} meeting${count === 1 ? "" : "s"}`;
 }
 
 function LettersIcon({ className }: { className?: string }) {
@@ -44,22 +44,48 @@ export function IssueGroupSection({ group }: { group: IssueGroup }) {
   return (
     <section id={group.bylawKey} className="scroll-mt-24 border-l-2 border-amber-400/60 pl-4 sm:pl-6">
       <header className="mb-4">
-        <div className="mb-1.5 flex flex-wrap items-center gap-2">
-          <span className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
-            Bylaw {group.bylawNum}
-          </span>
-          <span className="text-xs text-[var(--text-tertiary)]">{summary}</span>
+        {group.topicLabel ? (
+          /* New: topic label as primary, bylaw/meta as a muted single row */
+          <>
+            <h2 className="font-fraunces text-lg font-semibold text-[var(--text-primary)]">
+              {group.topicLabel}
+            </h2>
+            <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-[var(--text-tertiary)]">
+              <span>Bylaw {group.bylawNum}</span>
+              <span>·</span>
+              <span>{summary}</span>
+              {totalLetters > 0 && (
+                <>
+                  <span>·</span>
+                  <span className="inline-flex items-center gap-0.5 text-amber-700">
+                    <LettersIcon className="h-3 w-3" />
+                    {totalLetters} community letters
+                  </span>
+                </>
+              )}
+            </div>
+          </>
+        ) : (
+          /* Fallback: original badge layout when topic_label not yet populated */
+          <>
+            <div className="mb-1.5 flex flex-wrap items-center gap-2">
+              <span className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                Bylaw {group.bylawNum}
+              </span>
+              <span className="text-xs text-[var(--text-tertiary)]">{summary}</span>
 
-          {totalLetters > 0 && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
-              <LettersIcon className="h-3 w-3" />
-              {totalLetters} community letters
-            </span>
-          )}
-        </div>
-        <h2 className="font-fraunces text-lg font-semibold text-[var(--text-primary)]">
-          {group.title}
-        </h2>
+              {totalLetters > 0 && (
+                <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                  <LettersIcon className="h-3 w-3" />
+                  {totalLetters} community letters
+                </span>
+              )}
+            </div>
+            <h2 className="font-fraunces text-lg font-semibold text-[var(--text-primary)]">
+              {group.title}
+            </h2>
+          </>
+        )}
       </header>
 
       <div className="space-y-3">

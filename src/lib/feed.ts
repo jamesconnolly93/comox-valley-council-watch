@@ -5,6 +5,26 @@ export type FeedbackPosition = {
   detail: string;
 };
 
+export type KeyStat = {
+  label: string;
+  value: string;
+  type: "money" | "percentage" | "count" | "other";
+};
+
+export type CommunitySignal = {
+  type:
+    | "letters"
+    | "survey"
+    | "delegation"
+    | "petition"
+    | "public_hearing"
+    | "engagement"
+    | "other";
+  participant_count: number | null;
+  summary: string | null;
+  sentiment: "mixed" | "mostly_support" | "mostly_oppose" | "neutral" | null;
+};
+
 export type PublicFeedbackRow = {
   id: string;
   feedback_count: number | null;
@@ -32,6 +52,10 @@ export type FeedItem = {
   raw_content: string | null;
   is_significant: boolean | null;
   bylaw_number?: string | null;
+  headline?: string | null;
+  topic_label?: string | null;
+  key_stats?: KeyStat[] | null;
+  community_signal?: CommunitySignal | null;
   meeting_id: string;
   public_feedback?: PublicFeedbackRow | PublicFeedbackRow[] | null;
   meetings: {
@@ -55,6 +79,8 @@ export type IssueGroup = {
   bylawNum: string;
   /** Title from the most recent item */
   title: string;
+  /** AI-generated topic label (e.g. "Comox Zoning Update"), if available */
+  topicLabel: string | null;
   /** All items, sorted date descending */
   items: FeedItem[];
   latestDate: string;
@@ -197,6 +223,7 @@ export function groupItemsByIssue(items: FeedItem[]): {
       bylawKey,
       bylawNum,
       title: mostRecent.title,
+      topicLabel: mostRecent.topic_label ?? null,
       items: groupItems,
       latestDate: mostRecent.meetings?.date ?? "",
       municipalities,
@@ -292,6 +319,33 @@ export function deriveReadingStatus(item: FeedItem): string {
 
   const text = item.summary ?? item.description ?? "";
   return text.length > 80 ? text.slice(0, 80).trimEnd() + "\u2026" : text || item.title || "";
+}
+
+/**
+ * Strip "Bylaw No. XXXX – " or "Bylaw No. XXXX Being '..." prefix from item titles
+ * and fix title casing on the remaining descriptive text.
+ * Examples:
+ *   "Bylaw No. 2056 – Zoning Bylaw" → "Zoning Bylaw"
+ *   "Bylaw No. 890 Being 'flood Hazard Area Land Use Management Bylaw No. 890, 2026'" → "Flood Hazard Area Land Use Management"
+ */
+export function cleanItemTitle(title: string): string {
+  if (!title) return title;
+
+  let cleaned = title
+    // Strip "Bylaw No. XXXX – " or "Bylaw No. XXXX - " prefix (em-dash or hyphen)
+    .replace(/^Bylaw No\.?\s*[\w-]+\s*[–\-]+\s*/i, "")
+    // Strip "Being '" or 'Being "' prefix (e.g. Cumberland bylaw titles)
+    .replace(/^Being\s+['"]?/i, "")
+    // Strip trailing " Bylaw No. XXX, YYYY'" suffix
+    .replace(/\s*Bylaw No\.?\s*[\w-]+,?\s*\d{4}'?\s*$/i, "")
+    // Strip trailing ", YYYY'" remnant
+    .replace(/,?\s*\d{4}'?\s*$/, "")
+    .trim();
+
+  if (!cleaned || cleaned === title) return title;
+
+  // Capitalise first letter (fixes "flood Hazard" → "Flood Hazard")
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
 }
 
 /** Medium date: "Feb 18, 2026" — month abbreviation + day + year */
