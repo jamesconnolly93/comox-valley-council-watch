@@ -42,16 +42,25 @@ function firstSentence(text: string): string {
   return m ? m[0].trim() : text.slice(0, 120).trim();
 }
 
+const MONTH_PATTERN =
+  "(?:January|February|March|April|May|June|July|August|September|October|November|December)";
+
 /**
- * Strip leading date patterns from a meeting title so the card shows
- * just "Regular Council Meeting" instead of "February 18, 2026 Regular Council Meeting".
+ * Strip date noise from meeting titles so thread cards show a clean meeting type.
+ * Handles patterns from Courtenay, Comox, CVRD, and Cumberland scrapers.
  */
 function cleanMeetingTitle(title: string): string {
   return title
-    .replace(
-      /^(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s*\d{4}\s*/i,
-      ""
-    )
+    // Leading "Month DD, YYYY " → e.g. "February 18, 2026 Regular Council Meeting"
+    .replace(new RegExp(`^${MONTH_PATTERN}\\s+\\d{1,2}[,\\s]+\\d{4}\\s*`, "i"), "")
+    // Trailing " – Month DD, YYYY" or " - Month DD, YYYY"
+    .replace(new RegExp(`\\s*[–\\-]\\s*${MONTH_PATTERN}\\s+\\d{1,2}[,\\s]+\\d{4}$`, "i"), "")
+    // " for Month DD, YYYY" anywhere (Courtenay highlights style)
+    .replace(new RegExp(`\\s*\\bfor\\s+${MONTH_PATTERN}\\s+\\d{1,2}[,\\s]+\\d{4}\\b`, "i"), "")
+    // Leading municipality name + optional separator
+    .replace(/^(?:Courtenay|Comox|CVRD|Cumberland)\s*(?:[–\-]\s*)?/i, "")
+    // Leading "– " or "- " remnants
+    .replace(/^[–\-]\s*/, "")
     .trim();
 }
 

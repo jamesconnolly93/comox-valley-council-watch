@@ -4,13 +4,14 @@ import { MeetingGroup } from "@/components/MeetingGroup";
 import { IssueGroupSection } from "@/components/IssueGroupSection";
 import { FeedSkeleton } from "@/components/FeedSkeleton";
 import { ComplexityProviderWrapper } from "@/components/ComplexityProviderWrapper";
+import { ComplexitySlider } from "@/components/ComplexitySlider";
 import { fetchFilteredItems, getHighlights } from "./actions";
 import { Highlights } from "@/components/Highlights";
 import { DigestSignup } from "@/components/DigestSignup";
 
 export const metadata = {
   title: "Comox Valley Council Watch",
-  description: "Never miss a decision that matters to you",
+  description: "AI-powered summaries of council decisions across Courtenay, Comox, Cumberland & CVRD",
 };
 
 function MountainIcon({ className }: { className?: string }) {
@@ -57,7 +58,7 @@ async function FeedContent({
         <h2 className="font-fraunces text-xl font-semibold text-[var(--text-primary)]">
           No meetings yet
         </h2>
-        <p className="mt-2 font-source-sans text-[var(--text-secondary)]">
+        <p className="mt-2 text-[var(--text-secondary)]">
           No meetings have been processed yet.
         </p>
         <p className="mt-1 text-sm text-[var(--text-tertiary)]">
@@ -79,7 +80,7 @@ async function FeedContent({
         <h2 className="font-fraunces text-xl font-semibold text-[var(--text-primary)]">
           No items match
         </h2>
-        <p className="mt-2 font-source-sans text-[var(--text-secondary)]">
+        <p className="mt-2 text-[var(--text-secondary)]">
           No items match your filters.
         </p>
         <p className="mt-1 text-sm text-[var(--text-tertiary)]">
@@ -171,49 +172,51 @@ export default async function HomePage({
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
-      {/* Subtle top gradient */}
-      <div
-        className="pointer-events-none fixed left-0 right-0 top-0 h-48 bg-gradient-to-b from-[var(--accent)]/5 to-transparent"
-        aria-hidden
-      />
-
-      <header className="relative border-b border-[var(--border)] bg-[var(--surface-elevated)]/80 backdrop-blur-sm">
-        <div className="mx-auto max-w-[720px] px-5 py-8 sm:px-6">
-          <div className="flex items-start gap-3">
-            <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded text-[var(--accent)]">
-              <MountainIcon className="h-6 w-6" />
-            </div>
-            <div>
-              <h1 className="font-fraunces text-3xl font-semibold tracking-tight text-[var(--text-primary)] sm:text-4xl">
+      {/* Slim header */}
+      <header className="border-b border-[var(--border)] bg-[var(--surface-elevated)]/90 backdrop-blur-sm">
+        <div className="mx-auto max-w-4xl px-5 sm:px-6">
+          {/* Title row + subscribe (desktop) */}
+          <div className="flex items-center justify-between gap-4 py-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <MountainIcon className="h-5 w-5 shrink-0 text-[var(--accent)]" />
+              <span className="font-fraunces text-lg font-semibold text-[var(--text-primary)]">
                 Comox Valley Council Watch
-              </h1>
-              <p className="mt-1 font-source-sans text-base font-light text-[var(--text-secondary)]">
-                Never miss a decision that matters to you
-              </p>
-              <div className="mt-3 h-0.5 w-12 rounded-full bg-[var(--accent)]" />
+              </span>
             </div>
+            {/* Inline subscribe — desktop only */}
+            <div className="hidden w-72 shrink-0 sm:block">
+              <DigestSignup compact />
+            </div>
+          </div>
+          {/* Tagline */}
+          <p className="pb-2 text-sm text-[var(--text-tertiary)]">
+            AI-powered summaries of council decisions across Courtenay, Comox, Cumberland &amp; CVRD
+          </p>
+          {/* Subscribe — mobile only, below tagline */}
+          <div className="pb-3 sm:hidden">
+            <DigestSignup compact />
           </div>
         </div>
       </header>
 
-      <main className="relative mx-auto max-w-[720px] px-5 py-8 sm:px-6">
+      <main className="relative mx-auto max-w-4xl px-5 pt-6 pb-20 sm:px-6 md:pb-8">
         <ComplexityProviderWrapper>
-          <div className="space-y-8">
-            <div className="sticky top-0 z-30 -mx-5 bg-[var(--background)] px-5 pt-6 pb-4 shadow-sm sm:-mx-6 sm:px-6 border-b border-[var(--border)]">
+          <div className="space-y-6">
+            {/* Sticky filter toolbar */}
+            <div className="sticky top-0 z-30 -mx-5 border-b border-[var(--border)] bg-[var(--background)] px-5 pt-3 pb-3 shadow-sm sm:-mx-6 sm:px-6">
               <Suspense
                 fallback={
-                  <div className="h-14 rounded-2xl bg-[var(--surface-elevated)] animate-pulse" />
+                  <div className="h-14 animate-pulse rounded-2xl bg-[var(--surface-elevated)]" />
                 }
               >
                 <FilterBar />
               </Suspense>
             </div>
 
-            {highlights.length > 0 && (
-              <Highlights items={highlights} />
-            )}
+            {/* Complexity segmented control — inline on desktop, floating on mobile */}
+            <ComplexitySlider />
 
-            <DigestSignup />
+            {highlights.length > 0 && <Highlights items={highlights} />}
 
             <Suspense fallback={<FeedSkeleton />}>
               <FeedContent
@@ -226,35 +229,6 @@ export default async function HomePage({
           </div>
         </ComplexityProviderWrapper>
       </main>
-
-      <footer className="mt-16 border-t border-[var(--border)] bg-[var(--surface-elevated)] py-8">
-        <div className="mx-auto max-w-[720px] px-5 sm:px-6">
-          <p className="font-fraunces text-sm font-medium text-[var(--text-primary)]">
-            Built for the Comox Valley community
-          </p>
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            <a
-              href="https://www.courtenay.ca/news"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[var(--accent)] underline hover:no-underline"
-            >
-              Courtenay
-            </a>
-            <a
-              href="https://www.comox.ca/councilmeetings"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[var(--accent)] underline hover:no-underline"
-            >
-              Comox
-            </a>
-          </div>
-          <p className="mt-3 text-xs text-[var(--text-tertiary)]">
-            Meeting data sourced from public municipal records
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }

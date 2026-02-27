@@ -223,50 +223,60 @@ export function groupItemsByMeeting(items: FeedItem[]): MeetingWithItems[] {
 
 /**
  * Derive a short status string for a bylaw reading, used in thread child cards.
- * Checks decision, raw_content, description, and summary in order of reliability.
+ * Checks decision first (authoritative); falls back to summary only.
+ * Never checks raw_content or description — too much PDF boilerplate noise.
  */
 export function deriveReadingStatus(item: FeedItem): string {
-  const decision = (item.decision ?? "").toLowerCase();
-  const raw = (item.raw_content ?? "").toLowerCase();
-  const desc = (item.description ?? "").toLowerCase();
-  const summary = (item.summary ?? "").toLowerCase();
+  const decision = (item.decision ?? "").toLowerCase().trim();
 
-  // Helper: search across a given text blob
-  function check(t: string): string | null {
-    if (!t) return null;
-    // "Adopted" wins over just "third reading"
+  if (decision) {
+    const hasFirst = decision.includes("first reading") || decision.includes("1st reading");
+    const hasSecond = decision.includes("second reading") || decision.includes("2nd reading");
+    const hasThird = decision.includes("third reading") || decision.includes("3rd reading");
+    const hasAdopted = decision.includes("adopted") || decision.includes("finally passed");
+
+    // "First & second reading" check must come before "Adopted" so a decision that
+    // says "first and second reading … adopted as amended" doesn't falsely show "Adopted".
     if (
-      (t.includes("third reading") || t.includes("3rd reading")) &&
-      (t.includes("adopted") || t.includes("finally passed"))
-    ) return "Adopted";
-    if (t.includes("adopted") || t.includes("finally passed")) return "Adopted";
-    if (t.includes("third reading") || t.includes("3rd reading")) return "Third reading";
-    if (
-      t.includes("first and second reading") ||
-      t.includes("1st and 2nd reading") ||
-      t.includes("first & second reading") ||
-      t.includes("initial readings") ||
-      (t.includes("first reading") && t.includes("second reading"))
+      decision.includes("first and second reading") ||
+      decision.includes("1st and 2nd reading") ||
+      decision.includes("first & second reading") ||
+      decision.includes("initial readings") ||
+      (hasFirst && hasSecond)
     ) return "First & second reading";
-    if (t.includes("second reading") || t.includes("2nd reading")) return "Second reading";
-    if (t.includes("first reading") || t.includes("1st reading")) return "First reading";
-    if (t.includes("public hearing")) return "Public hearing";
-    if (t.includes("received for information")) return "Received for information";
-    if (t.includes("referred") || t.includes("referral")) return "Referred";
-    if (t.includes("tabled") || t.includes("deferred")) return "Deferred";
-    return null;
+
+    // Adopted = third reading explicitly passed — but NOT if first/second stage is mentioned
+    if (hasAdopted && !hasFirst && !hasSecond) {
+      if (hasThird || !decision.includes("reading")) return "Adopted";
+    }
+
+    if (hasThird) return "Third reading";
+    if (hasSecond) return "Second reading";
+    if (hasFirst) return "First reading";
+    if (decision.includes("public hearing")) return "Public hearing";
+    if (decision.includes("received for information")) return "Received for information";
+    if (decision.includes("referred") || decision.includes("referral")) return "Referred";
+    if (decision.includes("tabled") || decision.includes("deferred")) return "Deferred";
   }
 
-  return (
-    check(decision) ??
-    check(raw) ??
-    check(desc) ??
-    check(summary) ??
-    (() => {
-      const text = item.summary ?? item.description ?? "";
-      return text.length > 80 ? text.slice(0, 80).trimEnd() + "\u2026" : text || item.title || "";
-    })()
-  );
+  // Fall through to summary only (never raw_content/description — too noisy)
+  const summary = (item.summary ?? "").toLowerCase();
+  if (summary) {
+    if (summary.includes("public hearing")) return "Public hearing";
+    if (summary.includes("third reading")) return "Third reading";
+    if (
+      summary.includes("initial readings") ||
+      summary.includes("first and second reading") ||
+      summary.includes("first & second reading")
+    ) return "First & second reading";
+    if (summary.includes("first reading")) return "First reading";
+    if (summary.includes("referred") || summary.includes("referral")) return "Referred";
+    if (summary.includes("received for information")) return "Received for information";
+    if (summary.includes("tabled") || summary.includes("deferred")) return "Deferred";
+  }
+
+  const text = item.summary ?? item.description ?? "";
+  return text.length > 80 ? text.slice(0, 80).trimEnd() + "\u2026" : text || item.title || "";
 }
 
 /** Medium date: "Feb 18, 2026" — month abbreviation + day + year */
