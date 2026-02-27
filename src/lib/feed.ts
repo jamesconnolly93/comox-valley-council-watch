@@ -221,6 +221,30 @@ export function groupItemsByMeeting(items: FeedItem[]): MeetingWithItems[] {
   });
 }
 
+/**
+ * Derive a short status string for a bylaw reading, used in thread child cards.
+ * Checks decision text for reading stage keywords; falls back to summary excerpt.
+ */
+export function deriveReadingStatus(item: FeedItem): string {
+  const decision = (item.decision ?? "").toLowerCase();
+
+  if (decision.includes("adopted") || decision.includes("finally passed")) return "Adopted";
+  if (decision.includes("third reading") || decision.includes("3rd reading")) return "Third reading";
+  if (
+    decision.includes("first and second reading") ||
+    decision.includes("1st and 2nd reading") ||
+    decision.includes("first & second reading")
+  ) return "First & second reading";
+  if (decision.includes("second reading") || decision.includes("2nd reading")) return "Second reading";
+  if (decision.includes("first reading") || decision.includes("1st reading")) return "First reading";
+  if (decision.includes("public hearing")) return "Public hearing scheduled";
+  if (decision.includes("referred")) return "Referred";
+
+  const text = item.summary ?? item.description ?? "";
+  if (text.length > 80) return text.slice(0, 80).trimEnd() + "\u2026";
+  return text || item.title || "";
+}
+
 /** Abbreviated date for inline use, e.g. "Jan 21" */
 export function formatMeetingDateShort(dateStr: string | undefined): string {
   if (!dateStr) return "";

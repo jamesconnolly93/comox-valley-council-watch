@@ -3,21 +3,26 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { FeedItem } from "@/lib/feed";
-import { categoryLabel, isActionableImpact, municipalityBadgeClass } from "@/lib/feed";
+import {
+  categoryLabel,
+  isActionableImpact,
+  municipalityBadgeClass,
+  normaliseFeedback,
+  deriveReadingStatus,
+  formatMeetingDate,
+} from "@/lib/feed";
 import { useComplexity } from "@/lib/complexity-context";
 import { CommunityVoices } from "./CommunityVoices";
 import { ReactionButton } from "./ReactionButton";
 
 const TAG_LIMIT = 5;
 
-/** Humanize tag for display: development_cost_charges → Development Cost Charges */
 function formatTag(tag: string): string {
   return tag
     .replace(/_/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-/** Cleans raw PDF extraction artifacts from description/raw_content before display */
 function cleanContent(text: string, title: string): string {
   if (!text) return "";
   let result = text
@@ -37,15 +42,13 @@ function cleanContent(text: string, title: string): string {
     .trim();
   if (title.trim()) {
     const escapedTitle = title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    result = result.replace(
-      new RegExp(`^${escapedTitle}\\s*$`, "gmi"),
-      ""
-    ).trim();
+    result = result
+      .replace(new RegExp(`^${escapedTitle}\\s*$`, "gmi"), "")
+      .trim();
   }
   return result;
 }
 
-/** Returns true if expanded content is redundant (don't show expand) */
 function isContentRedundant(
   summary: string | null,
   expanded: string | null,
@@ -58,16 +61,33 @@ function isContentRedundant(
   const expandedLen = cleaned.length;
   if (summaryLen > 0 && expandedLen < summaryLen * 1.5) return true;
   const normalize = (s: string) =>
-    s
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, " ")
-      .slice(0, 100);
+    s.trim().toLowerCase().replace(/\s+/g, " ").slice(0, 100);
   const a = normalize(summary);
   const b = normalize(cleaned);
   if (a.length < 40 || b.length < 40) return false;
   return a === b || a.startsWith(b) || b.startsWith(a);
 }
+
+function getSummaryForComplexity(
+  item: FeedItem,
+  complexity: "simple" | "standard" | "expert"
+): string {
+  const fallback =
+    item.summary ?? item.description?.slice(0, 200) ?? "No summary available.";
+  if (complexity === "simple" && item.summary_simple?.trim())
+    return item.summary_simple.trim();
+  if (complexity === "expert" && item.summary_expert?.trim())
+    return item.summary_expert.trim();
+  return item.summary?.trim() || fallback;
+}
+
+/** First sentence of impact text for collapsed preview */
+function firstSentence(text: string): string {
+  const m = text.match(/^[^.!?]+[.!?]/);
+  return m ? m[0].trim() : text.slice(0, 120).trim();
+}
+
+// ---- Icons ----
 
 function ChevronIcon({ expanded }: { expanded: boolean }) {
   return (
@@ -79,7 +99,9 @@ function ChevronIcon({ expanded }: { expanded: boolean }) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={`h-4 w-4 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+      className={`h-4 w-4 shrink-0 transition-transform duration-200 ${
+        expanded ? "rotate-180" : ""
+      }`}
     >
       <path d="m6 9 6 6 6-6" />
     </svg>
@@ -155,38 +177,42 @@ function ShareIcon({ className }: { className?: string }) {
   );
 }
 
-function getSummaryForComplexity(
-  item: FeedItem,
-  complexity: "simple" | "standard" | "expert"
-): string {
-  const fallback = item.summary ?? item.description?.slice(0, 200) ?? "No summary available.";
-  if (complexity === "simple" && item.summary_simple?.trim()) {
-    return item.summary_simple.trim();
-  }
-  if (complexity === "expert" && item.summary_expert?.trim()) {
-    return item.summary_expert.trim();
-  }
-  return item.summary?.trim() || fallback;
+function SpeechBubbleSmall({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden
+    >
+      <path
+        fillRule="evenodd"
+        d="M4.848 2.771A49.144 49.144 0 0 1 12 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97-1.94.284-3.916.455-5.922.505a.803.803 0 0 0-.921.804l.008 3.086a.75.75 0 0 0 1.248.608l1.18-1.18c.954-.954.99-2.507.07-3.527C19.335 14.03 21 12.247 21 10.24V6.26c0-2.98-2.19-5.067-5.152-5.475A47.787 47.787 0 0 0 12 3.75c-2.32 0-4.634.167-6.852.475C2.19 4.193 0 6.28 0 9.26v6.02c0 2.98 2.19 5.067 5.152 5.475.386.063.777.124 1.17.178l.076.01a.75.75 0 0 0 .683-.745V14.9a.802.802 0 0 0-.722-.801 47.723 47.723 0 0 1-3.8-.387Z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
 }
 
 export function ItemCard({
   item,
   showMeetingMeta = true,
+  isThreadChild = false,
 }: {
   item: FeedItem;
   showMeetingMeta?: boolean;
+  isThreadChild?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const { complexity } = useComplexity();
   const shortName = item.meetings?.municipalities?.short_name ?? "Unknown";
-
   const badgeClass = municipalityBadgeClass(shortName);
+  const feedback = normaliseFeedback(item.public_feedback);
+  const feedbackCount = feedback?.feedback_count ?? 0;
 
   const categories = item.categories ?? (item.category ? [item.category] : []);
   const tags = item.tags ?? [];
-  const publicFeedback = Array.isArray(item.public_feedback)
-    ? item.public_feedback[0]
-    : item.public_feedback;
   const visibleTags = tags.slice(0, TAG_LIMIT);
   const remaining = tags.length - TAG_LIMIT;
 
@@ -197,149 +223,200 @@ export function ItemCard({
     expandedContent,
     item.title || ""
   );
-  const hasExpandableContent =
-    !!expandedContent && !isRedundant;
-  const hasMore =
-    hasExpandableContent ||
-    (!!item.decision && item.decision.length > 120);
+  const hasExpandableContent = !!expandedContent && !isRedundant;
+
+  const impactText = isActionableImpact(item.impact) ? item.impact!.trim() : null;
+
+  // What shows in the collapsed subtitle row
+  const collapsedSubtitle = isThreadChild
+    ? deriveReadingStatus(item)
+    : impactText
+    ? firstSentence(impactText)
+    : null;
+
+  // Primary label for thread child collapsed row (date + meeting title)
+  const meetingDateLabel = formatMeetingDate(item.meetings?.date);
+  const meetingTitle = item.meetings?.title;
+  const threadPrimaryLabel = meetingTitle
+    ? `${meetingDateLabel} — ${meetingTitle}`
+    : meetingDateLabel;
 
   return (
     <article
       id={item.id}
-      onClick={() => hasMore && setExpanded((e) => !e)}
-      className={`group relative scroll-mt-24 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-sm transition-all duration-200 hover:shadow-md ${
-        item.is_significant ? "bg-[var(--highlight)]/30" : ""
-      } ${hasMore ? "cursor-pointer" : ""}`}
+      className={`group relative scroll-mt-24 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-sm transition-shadow duration-200 hover:shadow-md ${
+        item.is_significant && !isThreadChild ? "border-amber-200/60" : ""
+      }`}
     >
-      {item.is_significant && (
-        <div className="absolute right-4 top-4 text-amber-500">
-          <StarIcon className="h-5 w-5" />
-        </div>
-      )}
-
-      {item.impact?.trim() && isActionableImpact(item.impact) && (
-        <div className="mb-2 flex items-start gap-1.5">
-          <UserIcon className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
-          <p className="truncate text-sm font-medium text-[var(--accent)] sm:max-w-none sm:overflow-visible sm:whitespace-normal">
-            {item.impact.trim()}
-          </p>
-        </div>
-      )}
-
-      {showMeetingMeta && (
-        <div className="mb-3">
+      {/* Collapsed header — always visible */}
+      <div
+        role="button"
+        tabIndex={0}
+        aria-expanded={expanded}
+        onClick={() => setExpanded((e) => !e)}
+        onKeyDown={(e) =>
+          (e.key === "Enter" || e.key === " ") && setExpanded((v) => !v)
+        }
+        className="flex cursor-pointer flex-col gap-1 px-4 py-3 select-none"
+      >
+        {/* Row 1: badge + title/date + star + chevron */}
+        <div className="flex min-w-0 items-center gap-2">
           <span
-            className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${badgeClass}`}
+            className={`inline-flex shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium ${badgeClass}`}
           >
             {shortName}
           </span>
+
+          <div className="min-w-0 flex-1 overflow-hidden">
+            {isThreadChild ? (
+              <span className="block truncate text-sm font-medium text-[var(--text-secondary)]">
+                {threadPrimaryLabel}
+              </span>
+            ) : (
+              <h3 className="truncate font-fraunces text-base font-semibold leading-snug text-[var(--text-primary)]">
+                {item.title}
+              </h3>
+            )}
+          </div>
+
+          {item.is_significant && !isThreadChild && (
+            <StarIcon className="h-3.5 w-3.5 shrink-0 text-amber-400" />
+          )}
+          <ChevronIcon expanded={expanded} />
         </div>
-      )}
 
-      <h3
-        className={`font-fraunces text-lg font-semibold text-[var(--text-primary)] ${showMeetingMeta ? "" : ""}`}
-      >
-        {item.title}
-      </h3>
-
-      <p
-        key={complexity}
-        className="mt-2 leading-relaxed text-[var(--text-secondary)] transition-opacity duration-150"
-        style={{ animation: "fade-in 0.15s ease-out" }}
-      >
-        {displaySummary}
-      </p>
-
-      <div className="mt-3" onClick={(e) => e.stopPropagation()}>
-        <ReactionButton itemId={item.id} />
+        {/* Row 2: subtitle + community badge */}
+        {(collapsedSubtitle || feedbackCount > 0) && (
+          <div className="flex min-w-0 items-center gap-3">
+            {collapsedSubtitle && (
+              <span
+                className={`min-w-0 flex-1 truncate text-sm ${
+                  isThreadChild
+                    ? "font-medium text-[var(--text-primary)]"
+                    : "text-[var(--text-secondary)]"
+                }`}
+              >
+                {collapsedSubtitle}
+              </span>
+            )}
+            {feedbackCount > 0 && (
+              <span className="ml-auto flex shrink-0 items-center gap-1 text-xs text-[var(--text-tertiary)]">
+                <SpeechBubbleSmall className="h-3 w-3" />
+                {feedbackCount} letters
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
-      {publicFeedback && (
-        <CommunityVoices data={publicFeedback} />
-      )}
+      {/* Expanded body — grid-row animation */}
+      <div
+        className="grid transition-[grid-template-rows] duration-200 ease-in-out"
+        style={{ gridTemplateRows: expanded ? "1fr" : "0fr" }}
+      >
+        <div className="overflow-hidden">
+          <div className="border-t border-[var(--border)] px-4 pb-4 pt-4 space-y-3">
+            {/* Impact callout (regular cards only) */}
+            {!isThreadChild && impactText && (
+              <div className="flex items-start gap-1.5">
+                <UserIcon className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
+                <p className="text-sm font-medium text-[var(--accent)]">
+                  {impactText}
+                </p>
+              </div>
+            )}
 
-      {item.decision && (
-        <div className="mt-3 rounded-lg border-l-2 border-[var(--accent)] bg-[var(--accent-light)]/50 py-2 pl-3 pr-3">
-          <div className="flex items-start gap-2">
-            <div className="mt-0.5 shrink-0 text-[var(--accent)]">
-              <GavelIcon className="h-4 w-4" />
-            </div>
-            <div>
-              <span className="text-xs font-medium text-[var(--accent)]">
-                Decision
-              </span>
-              <p className="mt-0.5 text-sm italic text-[var(--text-primary)]">
-                {expanded || item.decision.length <= 120
-                  ? item.decision
-                  : `${item.decision.slice(0, 120)}…`}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {expanded && hasExpandableContent && (
-        <div
-          className="mt-4 overflow-hidden rounded-lg bg-[var(--surface-elevated)] p-4 text-sm text-[var(--text-secondary)]"
-          style={{ animation: "fade-in 0.2s ease-out" }}
-        >
-          <h4 className="mb-2 font-medium text-[var(--text-primary)]">
-            Full description
-          </h4>
-          <div className="whitespace-pre-wrap leading-relaxed">
-            {cleanContent(expandedContent, item.title || "")}
-          </div>
-        </div>
-      )}
-
-      {(categories.length > 0 || tags.length > 0) && (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {categories.map((cat, i) => (
-            <span
-              key={cat}
-              className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                i === 0
-                  ? "bg-[var(--accent-light)] text-[var(--accent)]"
-                  : "bg-[var(--surface-elevated)] text-[var(--text-secondary)]"
-              }`}
+            {/* Summary */}
+            <p
+              key={complexity}
+              className="leading-relaxed text-[var(--text-secondary)]"
+              style={{ animation: "fade-in 0.15s ease-out" }}
             >
-              {categoryLabel(cat)}
-            </span>
-          ))}
-          {visibleTags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full bg-[var(--surface-elevated)] px-2 py-0.5 text-xs text-[var(--text-tertiary)]"
-            >
-              {formatTag(tag)}
-            </span>
-          ))}
-          {remaining > 0 && (
-            <span className="text-xs text-[var(--text-tertiary)]">
-              +{remaining} more
-            </span>
-          )}
-        </div>
-      )}
+              {displaySummary}
+            </p>
 
-      <div className="mt-3 flex items-center justify-between">
-        {hasMore ? (
-          <div className="flex items-center gap-1 text-xs text-[var(--text-tertiary)]">
-            <ChevronIcon expanded={expanded} />
-            <span>{expanded ? "Collapse" : "Expand"}</span>
+            {/* Raw content (when not redundant with summary) */}
+            {hasExpandableContent && (
+              <div className="rounded-lg bg-[var(--surface-elevated)] p-4 text-sm text-[var(--text-secondary)]">
+                <h4 className="mb-2 font-medium text-[var(--text-primary)]">
+                  Full description
+                </h4>
+                <div className="whitespace-pre-wrap leading-relaxed">
+                  {cleanContent(expandedContent, item.title || "")}
+                </div>
+              </div>
+            )}
+
+            {/* Decision */}
+            {item.decision && (
+              <div className="rounded-lg border-l-2 border-[var(--accent)] bg-[var(--accent-light)]/50 py-2 pl-3 pr-3">
+                <div className="flex items-start gap-2">
+                  <GavelIcon className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
+                  <div>
+                    <span className="text-xs font-medium text-[var(--accent)]">
+                      Decision
+                    </span>
+                    <p className="mt-0.5 text-sm italic text-[var(--text-primary)]">
+                      {item.decision}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Reaction button */}
+            <div onClick={(e) => e.stopPropagation()}>
+              <ReactionButton itemId={item.id} />
+            </div>
+
+            {/* Community Voices */}
+            {feedback && <CommunityVoices data={feedback} />}
+
+            {/* Category + tag pills */}
+            {(categories.length > 0 || tags.length > 0) && (
+              <div className="flex flex-wrap gap-2">
+                {categories.map((cat, i) => (
+                  <span
+                    key={cat}
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      i === 0
+                        ? "bg-[var(--accent-light)] text-[var(--accent)]"
+                        : "bg-[var(--surface-elevated)] text-[var(--text-secondary)]"
+                    }`}
+                  >
+                    {categoryLabel(cat)}
+                  </span>
+                ))}
+                {visibleTags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full bg-[var(--surface-elevated)] px-2 py-0.5 text-xs text-[var(--text-tertiary)]"
+                  >
+                    {formatTag(tag)}
+                  </span>
+                ))}
+                {remaining > 0 && (
+                  <span className="text-xs text-[var(--text-tertiary)]">
+                    +{remaining} more
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Share link */}
+            <div className="flex justify-end">
+              <Link
+                href={`/item/${item.id}`}
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1 text-xs text-[var(--text-tertiary)] transition-colors hover:text-[var(--accent)]"
+                title="Share this item"
+              >
+                <ShareIcon className="h-3.5 w-3.5" />
+                Share
+              </Link>
+            </div>
           </div>
-        ) : (
-          <span />
-        )}
-        <Link
-          href={`/item/${item.id}`}
-          onClick={(e) => e.stopPropagation()}
-          className="flex items-center gap-1 text-xs text-[var(--text-tertiary)] hover:text-[var(--accent)] transition-colors"
-          title="Share this item"
-        >
-          <ShareIcon className="h-3.5 w-3.5" />
-          Share
-        </Link>
+        </div>
       </div>
     </article>
   );
