@@ -1,3 +1,22 @@
+export type FeedbackPosition = {
+  stance: string;
+  sentiment: "oppose" | "support" | "neutral";
+  count: number;
+  detail: string;
+};
+
+export type PublicFeedbackRow = {
+  id: string;
+  feedback_count: number | null;
+  sentiment_summary: string | null;
+  support_count: number | null;
+  oppose_count: number | null;
+  neutral_count: number | null;
+  positions?: FeedbackPosition[] | null;
+  themes?: string[] | null;
+  raw_excerpts?: string[] | null;
+};
+
 export type FeedItem = {
   id: string;
   title: string;
@@ -13,6 +32,7 @@ export type FeedItem = {
   raw_content: string | null;
   is_significant: boolean | null;
   meeting_id: string;
+  public_feedback?: PublicFeedbackRow | null;
   meetings: {
     id: string;
     date: string;

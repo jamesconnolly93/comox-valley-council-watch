@@ -43,6 +43,9 @@ async function main() {
   console.error("\n=== Step 4: Processing AI summaries ===\n");
   await run(join(ROOT, "scripts", "process-ai-summaries.mjs"));
 
+  console.error("\n=== Step 5: Processing public feedback (Community Voices) ===\n");
+  await run(join(ROOT, "scripts", "process-feedback.mjs"));
+
   console.error("\n=== Pipeline complete ===");
 }
 

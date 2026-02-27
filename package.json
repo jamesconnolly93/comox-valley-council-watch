@@ -18,6 +18,8 @@
     "test:decision": "node scripts/test-decision-extraction.mjs",
     "pipeline": "node scripts/run-pipeline.mjs",
     "process:ai": "node scripts/process-ai-summaries.mjs",
+    "process:feedback": "node scripts/process-feedback.mjs",
+    "process:feedback:dry": "node scripts/process-feedback.mjs --dry-run",
     "reprocess:impacts": "node scripts/reprocess-impacts.mjs",
     "reprocess:summaries": "node scripts/reprocess-summaries.mjs",
     "reprocess:summaries:dry": "node scripts/reprocess-summaries.mjs --dry-run"

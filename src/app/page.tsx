@@ -3,7 +3,8 @@ import { FilterBar } from "@/components/FilterBar";
 import { MeetingGroup } from "@/components/MeetingGroup";
 import { FeedSkeleton } from "@/components/FeedSkeleton";
 import { ComplexityProviderWrapper } from "@/components/ComplexityProviderWrapper";
-import { fetchFilteredItems } from "./actions";
+import { fetchFilteredItems, getHighlights } from "./actions";
+import { Highlights } from "@/components/Highlights";
 
 export const metadata = {
   title: "Comox Valley Council Watch",
@@ -148,6 +149,11 @@ export default async function HomePage({
   const category =
     typeof params?.category === "string" ? params.category : null;
 
+  const showHighlights =
+    (!municipality || municipality === "all") &&
+    (!category || category === "all");
+  const highlights = showHighlights ? await getHighlights() : [];
+
   return (
     <div className="min-h-screen bg-[var(--background)]">
       {/* Subtle top gradient */}
@@ -187,6 +193,10 @@ export default async function HomePage({
                 <FilterBar />
               </Suspense>
             </div>
+
+            {highlights.length > 0 && (
+              <Highlights items={highlights} />
+            )}
 
             <Suspense fallback={<FeedSkeleton />}>
               <FeedContent

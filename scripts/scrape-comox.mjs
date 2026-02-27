@@ -25,6 +25,8 @@ const PAGE_DELAY_MS = 2000;
 const PDF_DELAY_MS = 1000;
 const MIN_DESCRIPTION_LENGTH = 100;
 const MAX_CONTENT_LENGTH = 2000;
+const MAX_RAW_FEEDBACK_CHARS = 50000;
+const FEEDBACK_SAMPLE_CHARS = 40000;
 
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
@@ -140,13 +142,76 @@ async function scrapeMeetingPage(url) {
       const buf = await fetchWithRetry(result.agendaUrl, { binary: true });
       const pdfBuffer = Buffer.from(buf);
       const data = await pdf(pdfBuffer);
-      result.items = parseAgendaPdf(data.text ?? "");
+      const pdfText = data.text ?? "";
+      result.items = parseAgendaPdf(pdfText);
+      result.rawFeedback = extractFeedbackFromPdf(pdfText);
     } catch (err) {
       console.error(`  PDF parse failed: ${err.message}`);
     }
   }
 
   return result;
+}
+
+/**
+ * Extract public hearing correspondence from the "Page 20-X" section.
+ * Letters live in this subsection (~8K through ~60K+ chars). The numbered
+ * index may be in a table that pdf-parse can't extract; we count by letter markers.
+ */
+function extractFeedbackFromPdf(text) {
+  if (!text || typeof text !== "string") return null;
+
+  // Letters are in the "Page 20-" subsection of the PDF
+  const startMatch = text.indexOf("Page 20-1");
+  if (startMatch === -1) return null;
+
+  // Find the end: last occurrence of "Page 20-N" pattern
+  const pagePattern = /Page 20-\d+/g;
+  let lastPageEnd = startMatch;
+  let match;
+  while ((match = pagePattern.exec(text)) !== null) {
+    lastPageEnd = match.index + match[0].length;
+  }
+
+  const letterSection = text.slice(startMatch, lastPageEnd + 500);
+
+  // Page 20 section spans 20-1 through 20-N (e.g. 134 pages of submissions)
+  const pageNumbers = letterSection.match(/Page 20-(\d+)/g) || [];
+  const maxPage =
+    pageNumbers.length > 0
+      ? Math.max(
+          ...pageNumbers.map((p) => parseInt(p.match(/\d+$/)[0], 10))
+        )
+      : 1;
+  const estimatedFromPages = Math.round(maxPage / 2);
+
+  // Count individual letters by salutations and email headers
+  const dearCount = (
+    letterSection.match(/Dear (?:Mayor|Council|Town)/gi) || []
+  ).length;
+  const emailFromCount = (letterSection.match(/^From:\s*.*$/gm) || []).length;
+
+  // Use whichever count is higher: marker count or page estimate
+  const letterCount = Math.max(
+    dearCount + emailFromCount,
+    estimatedFromPages,
+    1
+  );
+
+  // Sample: first 40K chars of letter content for Claude analysis
+  const sample =
+    letterCount +
+    " letters identified in public hearing correspondence.\n\n" +
+    letterSection.slice(0, FEEDBACK_SAMPLE_CHARS);
+
+  // Keep total stored payload under 50k (rawText + sample + JSON overhead)
+  const rawTextMax = 35000;
+  return {
+    rawText: letterSection.slice(0, rawTextMax),
+    letterCount,
+    maxPage,
+    sample,
+  };
 }
 
 /**
@@ -375,6 +440,15 @@ async function storeComoxResults(supabase, results, municipalityId) {
             agenda_url: parsed.agendaUrl,
             minutes_url: parsed.minutesUrl,
             video_url: parsed.videoUrl,
+            raw_feedback:
+              parsed.rawFeedback?.rawText && parsed.rawFeedback.rawText.length > 0
+                ? JSON.stringify({
+                    rawText: parsed.rawFeedback.rawText,
+                    letterCount: parsed.rawFeedback.letterCount,
+                    maxPage: parsed.rawFeedback.maxPage,
+                    sample: parsed.rawFeedback.sample,
+                  })
+                : null,
           },
           { onConflict: "municipality_id,date,meeting_type" }
         )
@@ -455,7 +529,10 @@ async function main() {
     try {
       const parsed = await scrapeMeetingPage(href);
       results.push(parsed);
-      console.error(`  → ${parsed.items.length} items from agenda PDF`);
+      const fbNote = parsed.rawFeedback
+        ? `, ${parsed.rawFeedback.letterCount} letters extracted`
+        : "";
+      console.error(`  → ${parsed.items.length} items from agenda PDF${fbNote}`);
     } catch (err) {
       console.error(`  → Error: ${err instanceof Error ? err.message : err}`);
     }

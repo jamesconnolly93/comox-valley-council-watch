@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { FeedItem } from "@/lib/feed";
 import { categoryLabel } from "@/lib/feed";
 import { useComplexity } from "@/lib/complexity-context";
+import { CommunityVoices } from "./CommunityVoices";
 
 const TAG_LIMIT = 5;
 
@@ -177,6 +178,9 @@ export function ItemCard({
 
   const categories = item.categories ?? (item.category ? [item.category] : []);
   const tags = item.tags ?? [];
+  const publicFeedback = Array.isArray(item.public_feedback)
+    ? item.public_feedback[0]
+    : item.public_feedback;
   const visibleTags = tags.slice(0, TAG_LIMIT);
   const remaining = tags.length - TAG_LIMIT;
 
@@ -195,8 +199,9 @@ export function ItemCard({
 
   return (
     <article
+      id={item.id}
       onClick={() => hasMore && setExpanded((e) => !e)}
-      className={`group relative rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-sm transition-all duration-200 hover:shadow-md ${
+      className={`group relative scroll-mt-24 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-sm transition-all duration-200 hover:shadow-md ${
         item.is_significant ? "bg-[var(--highlight)]/30" : ""
       } ${hasMore ? "cursor-pointer" : ""}`}
     >
@@ -238,6 +243,10 @@ export function ItemCard({
       >
         {displaySummary}
       </p>
+
+      {publicFeedback && (
+        <CommunityVoices data={publicFeedback} />
+      )}
 
       {item.decision && (
         <div className="mt-3 rounded-lg border-l-2 border-[var(--accent)] bg-[var(--accent-light)]/50 py-2 pl-3 pr-3">

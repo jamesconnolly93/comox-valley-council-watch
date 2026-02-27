@@ -58,6 +58,15 @@ export async function fetchFilteredItems(params: {
       is_significant,
       categories,
       meeting_id,
+      public_feedback (
+        id,
+        feedback_count,
+        sentiment_summary,
+        support_count,
+        oppose_count,
+        neutral_count,
+        positions
+      ),
       meetings!inner (
         id,
         date,
@@ -120,4 +129,46 @@ export async function fetchFilteredItems(params: {
   const groups = groupItemsByMeeting(items);
 
   return { groups, dbEmpty: false };
+}
+
+export type HighlightItem = FeedItem;
+
+/** Fetch curated highlights (is_significant + actionable impact) for "This Week" hero */
+export async function getHighlights(limit = 5): Promise<HighlightItem[]> {
+  const supabase = await createClient();
+
+  const selectCols = `
+    id, title, summary, summary_simple, summary_expert, impact, category, categories,
+    is_significant, meeting_id,
+    meetings!inner(id, date, title, municipality_id,
+      municipalities(id, name, short_name)
+    )
+  `;
+
+  let { data } = await supabase
+    .from("items")
+    .select(selectCols)
+    .eq("is_significant", true)
+    .not("impact", "is", null)
+    .limit(limit);
+
+  if (!data || data.length < 3) {
+    const { data: fallback } = await supabase
+      .from("items")
+      .select(selectCols)
+      .eq("is_significant", true)
+      .limit(limit);
+    data = fallback;
+  }
+
+  if (!data || data.length < 3) return [];
+
+  const items = data as unknown as HighlightItem[];
+  items.sort((a, b) => {
+    const dateA = a.meetings?.date ?? "";
+    const dateB = b.meetings?.date ?? "";
+    return dateB.localeCompare(dateA);
+  });
+
+  return items.slice(0, limit);
 }
