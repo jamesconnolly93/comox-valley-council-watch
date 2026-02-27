@@ -6,10 +6,10 @@ import { MUNICIPALITIES, CATEGORIES } from "@/lib/feed";
 import { useComplexity } from "@/lib/complexity-context";
 import type { Complexity } from "@/lib/complexity-context";
 
-const COMPLEXITY_LEVELS: { value: Complexity; label: string }[] = [
-  { value: "simple", label: "Simple" },
-  { value: "standard", label: "Standard" },
-  { value: "expert", label: "Expert" },
+const COMPLEXITY_LEVELS: { value: Complexity; label: string; desc: string }[] = [
+  { value: "simple",   label: "Simple",   desc: "Headlines only — tap to read more" },
+  { value: "standard", label: "Standard", desc: "Key facts at a glance" },
+  { value: "expert",   label: "Expert",   desc: "Full detail inline" },
 ];
 
 export function FilterBar() {
@@ -37,7 +37,7 @@ export function FilterBar() {
   );
 
   return (
-    <div className={`flex flex-col gap-2 transition-opacity duration-150 ${isPending ? "opacity-60" : ""}`}>
+    <div className={`flex flex-col gap-2.5 transition-opacity duration-150 ${isPending ? "opacity-60" : ""}`}>
 
       {/* Row 1: Municipality pills (left) + Sort toggle (right) */}
       <div className="flex items-center gap-2">
@@ -77,10 +77,10 @@ export function FilterBar() {
         </div>
       </div>
 
-      {/* Row 2: Category (left, flexible) + Reading level (right, fixed) */}
-      <div className="flex items-center gap-2">
+      {/* Row 2: Category pills — full width, horizontally scrollable */}
+      <div>
         {/* Mobile: native select */}
-        <div className="relative flex-1 md:hidden">
+        <div className="relative md:hidden">
           <select
             value={category}
             onChange={(e) => updateParams({ category: e.target.value })}
@@ -98,7 +98,7 @@ export function FilterBar() {
         </div>
 
         {/* Desktop: scrollable chip strip */}
-        <div className="relative hidden flex-1 md:block">
+        <div className="relative hidden md:block">
           <div className="flex gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
             {CATEGORIES.map((c) => (
               <button
@@ -116,24 +116,25 @@ export function FilterBar() {
             ))}
           </div>
           {/* Fade hint on right edge */}
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[var(--background)] to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[var(--background)] to-transparent" />
         </div>
+      </div>
 
-        {/* Reading level — right side, matches Sort toggle style */}
-        <div className="flex shrink-0 items-center gap-0.5 border-l border-[var(--border)] pl-3">
-          <span className="hidden pr-1 text-xs text-[var(--text-tertiary)] sm:block">
-            Level
-          </span>
+      {/* Row 3: Reading level — prominent full-width segmented control */}
+      <div className="flex items-center gap-3">
+        <span className="shrink-0 text-sm text-[var(--text-tertiary)]">Reading level</span>
+        <div className="grid flex-1 grid-cols-3 overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-0.5">
           {COMPLEXITY_LEVELS.map((level) => (
             <button
               key={level.value}
               type="button"
               onClick={() => setComplexity(level.value)}
               aria-pressed={complexity === level.value}
-              className={`rounded px-2 py-1 text-xs transition-colors duration-150 ${
+              title={level.desc}
+              className={`rounded-md py-1.5 text-sm font-medium transition-all duration-150 ${
                 complexity === level.value
-                  ? "font-semibold text-[var(--text-primary)]"
-                  : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+                  ? "bg-[var(--accent)] text-white shadow-sm"
+                  : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
               }`}
             >
               {level.label}

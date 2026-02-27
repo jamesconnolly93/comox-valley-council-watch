@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import type { FeedItem } from "@/lib/feed";
-import type { KeyStat, CommunitySignal } from "@/lib/feed";
+import type { FeedItem, KeyStat, CommunitySignal } from "@/lib/feed";
 import {
   categoryLabel,
   isActionableImpact,
@@ -13,6 +12,7 @@ import {
   deriveReadingStatus,
   formatMeetingDateMedium,
   cleanItemTitle,
+  cleanMeetingTitle,
 } from "@/lib/feed";
 import { useComplexity } from "@/lib/complexity-context";
 import { CommunityVoices } from "./CommunityVoices";
@@ -44,28 +44,6 @@ function getSummaryForComplexity(
 function firstSentence(text: string): string {
   const m = text.match(/^[^.!?]+[.!?]/);
   return m ? m[0].trim() : text.slice(0, 120).trim();
-}
-
-const MONTH_PATTERN =
-  "(?:January|February|March|April|May|June|July|August|September|October|November|December)";
-
-/**
- * Strip date noise from meeting titles so thread cards show a clean meeting type.
- * Handles patterns from Courtenay, Comox, CVRD, and Cumberland scrapers.
- */
-function cleanMeetingTitle(title: string): string {
-  return title
-    // Leading "Month DD, YYYY " → e.g. "February 18, 2026 Regular Council Meeting"
-    .replace(new RegExp(`^${MONTH_PATTERN}\\s+\\d{1,2}[,\\s]+\\d{4}\\s*`, "i"), "")
-    // Trailing " – Month DD, YYYY" or " - Month DD, YYYY"
-    .replace(new RegExp(`\\s*[–\\-]\\s*${MONTH_PATTERN}\\s+\\d{1,2}[,\\s]+\\d{4}$`, "i"), "")
-    // " for Month DD, YYYY" anywhere (Courtenay highlights style)
-    .replace(new RegExp(`\\s*\\bfor\\s+${MONTH_PATTERN}\\s+\\d{1,2}[,\\s]+\\d{4}\\b`, "i"), "")
-    // Leading municipality name + optional separator
-    .replace(/^(?:Courtenay|Comox|CVRD|Cumberland)\s*(?:[–\-]\s*)?/i, "")
-    // Leading "– " or "- " remnants
-    .replace(/^[–\-]\s*/, "")
-    .trim();
 }
 
 // ---- Icons ----
@@ -163,7 +141,6 @@ function LettersIcon({ className }: { className?: string }) {
   );
 }
 
-
 function communitySignalBadgeLabel(signal: CommunitySignal): string {
   const n = signal.participant_count;
   switch (signal.type) {
@@ -193,6 +170,11 @@ export function ItemCard({
 }) {
   const [expanded, setExpanded] = useState(false);
   const { complexity } = useComplexity();
+
+  const isSimple = complexity === "simple";
+  const isExpert = complexity === "expert";
+  const isExpanded = isExpert || expanded;
+
   const shortName = item.meetings?.municipalities?.short_name ?? "Unknown";
   const badgeClass = municipalityBadgeClass(shortName);
   const feedback = normaliseFeedback(item.public_feedback);
@@ -210,11 +192,11 @@ export function ItemCard({
   const impactText = isActionableImpact(item.impact) ? item.impact!.trim() : null;
   const highImpact = !isThreadChild && isHighImpact(item.impact);
 
-  // Collapsed subtitle: reading status for thread children, impact snippet for regular cards
-  const collapsedSubtitle = isThreadChild
-    ? deriveReadingStatus(item)
-    : impactText
-    ? firstSentence(impactText)
+  // Collapsed subtitle: reading status (thread children) or impact snippet (regular)
+  // Only used in Standard mode — Expert shows everything, Simple shows nothing
+  const readingStatus = isThreadChild ? (deriveReadingStatus(item) || null) : null;
+  const collapsedSubtitle = !isExpert
+    ? (readingStatus ?? (impactText ? firstSentence(impactText) : null))
     : null;
 
   // Thread child header: "Feb 18, 2026 — Regular Council Meeting"
@@ -224,35 +206,87 @@ export function ItemCard({
     ? `${formatMeetingDateMedium(item.meetings?.date)} — ${cleanedMeetingTitle}`
     : formatMeetingDateMedium(item.meetings?.date);
 
-  // Card title: prefer AI headline (clean, editorial), fall back to cleaned raw title
+  // Card title: prefer AI headline, fall back to cleaned raw title
   const displayTitle = isThreadChild
     ? item.title
     : (item.headline ?? cleanItemTitle(item.title));
 
-  // Border: amber left accent for high-impact, subtle amber all-around for is_significant
+  // Border styling
   const borderClass = highImpact
     ? "border border-[var(--border)] border-l-[3px] border-l-amber-400"
     : item.is_significant && !isThreadChild
     ? "border border-amber-200/70"
     : "border border-[var(--border)]";
 
+  // ====== SIMPLE MODE: single compact row, entire card is a link ======
+  if (isSimple) {
+    const rightBadge = feedbackCount > 0 ? (
+      <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
+        <LettersIcon className="h-3 w-3" />
+        {feedbackCount}
+      </span>
+    ) : communitySignal?.participant_count ? (
+      <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
+        {communitySignalBadgeLabel(communitySignal)}
+      </span>
+    ) : null;
+
+    return (
+      <article
+        id={item.id}
+        className={`group relative scroll-mt-24 overflow-hidden rounded-xl bg-[var(--surface)] shadow-sm transition-shadow duration-200 hover:shadow-md ${borderClass}`}
+      >
+        <Link href={`/item/${item.id}`} className="flex min-w-0 items-center gap-2 px-4 py-2.5">
+          {!hideMunicipality && (
+            <span
+              className={`inline-flex shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium ${badgeClass}`}
+            >
+              {shortName}
+            </span>
+          )}
+          <div className="min-w-0 flex-1 overflow-hidden">
+            {isThreadChild ? (
+              <span className="block truncate text-sm text-[var(--text-secondary)]">
+                {threadPrimaryLabel}
+                {readingStatus && (
+                  <span className="ml-2 font-medium text-[var(--text-primary)]">
+                    · {readingStatus}
+                  </span>
+                )}
+              </span>
+            ) : (
+              <span className="block truncate font-fraunces text-base font-semibold text-[var(--text-primary)]">
+                {displayTitle}
+              </span>
+            )}
+          </div>
+          {rightBadge}
+          <span className="shrink-0 text-base leading-none text-[var(--text-tertiary)]" aria-hidden>›</span>
+        </Link>
+      </article>
+    );
+  }
+
+  // ====== STANDARD + EXPERT MODE ======
   return (
     <article
       id={item.id}
       className={`group relative scroll-mt-24 overflow-hidden rounded-xl bg-[var(--surface)] shadow-sm transition-shadow duration-200 hover:shadow-md ${borderClass}`}
     >
-      {/* Collapsed header — always visible */}
+      {/* Header — button only in Standard mode */}
       <div
-        role="button"
-        tabIndex={0}
-        aria-expanded={expanded}
-        onClick={() => setExpanded((e) => !e)}
-        onKeyDown={(e) =>
-          (e.key === "Enter" || e.key === " ") && setExpanded((v) => !v)
+        role={isExpert ? undefined : "button"}
+        tabIndex={isExpert ? undefined : 0}
+        aria-expanded={isExpert ? undefined : expanded}
+        onClick={isExpert ? undefined : () => setExpanded((e) => !e)}
+        onKeyDown={
+          isExpert
+            ? undefined
+            : (e) => (e.key === "Enter" || e.key === " ") && setExpanded((v) => !v)
         }
-        className="flex cursor-pointer flex-col gap-1 px-4 py-3 select-none"
+        className={`flex flex-col gap-1 px-4 py-3 ${isExpert ? "" : "cursor-pointer select-none"}`}
       >
-        {/* Row 1: [badge] · title · [community badge] · chevron */}
+        {/* Row 1: [badge] · title/date · [community badges] · [chevron] */}
         <div className="flex min-w-0 items-center gap-2">
           {!hideMunicipality && (
             <span
@@ -274,7 +308,7 @@ export function ItemCard({
             )}
           </div>
 
-          {/* Community letters badge — warm pill, visible at a glance */}
+          {/* Community letters badge */}
           {feedbackCount > 0 && (
             <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
               <LettersIcon className="h-3 w-3" />
@@ -282,18 +316,19 @@ export function ItemCard({
             </span>
           )}
 
-          {/* Community signal badge (lightweight — shown when no full public_feedback) */}
+          {/* Community signal badge (lightweight — no full feedback) */}
           {!hasFeedback && !isThreadChild && communitySignal?.participant_count && (
             <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
               {communitySignalBadgeLabel(communitySignal)}
             </span>
           )}
 
-          <ChevronIcon expanded={expanded} />
+          {/* Chevron — Standard only */}
+          {!isExpert && <ChevronIcon expanded={expanded} />}
         </div>
 
-        {/* Row 2: subtitle (impact snippet or reading status) */}
-        {collapsedSubtitle && (
+        {/* Row 2: subtitle — Standard only (Expert shows everything in body) */}
+        {!isExpert && collapsedSubtitle && (
           <div className="flex min-w-0 pl-0.5">
             <span
               className={`min-w-0 flex-1 truncate text-sm ${
@@ -306,17 +341,16 @@ export function ItemCard({
             </span>
           </div>
         )}
-
       </div>
 
-      {/* Expanded body — grid-row animation */}
+      {/* Expanded body — grid-row animation; always 1fr in Expert mode */}
       <div
         className="grid transition-[grid-template-rows] duration-200 ease-in-out"
-        style={{ gridTemplateRows: expanded ? "1fr" : "0fr" }}
+        style={{ gridTemplateRows: isExpanded ? "1fr" : "0fr" }}
       >
         <div className="overflow-hidden">
           <div className="space-y-3 border-t border-[var(--border)] px-4 pb-4 pt-4">
-            {/* Impact callout (regular cards only) */}
+            {/* Impact callout — regular cards only */}
             {!isThreadChild && impactText && (
               <div className="flex items-start gap-1.5">
                 <UserIcon className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
@@ -335,7 +369,7 @@ export function ItemCard({
               {displaySummary}
             </p>
 
-            {/* Key stats — quiet inline text, not colored pills */}
+            {/* Key stats — quiet inline text */}
             {!isThreadChild && keyStats.length > 0 && (
               <p className="text-sm text-[var(--text-tertiary)]">
                 {keyStats.map((stat, i) => (

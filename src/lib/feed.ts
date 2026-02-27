@@ -326,8 +326,8 @@ export function deriveReadingStatus(item: FeedItem): string {
     if (summary.includes("tabled") || summary.includes("deferred")) return "Deferred";
   }
 
-  const text = item.summary ?? item.description ?? "";
-  return text.length > 80 ? text.slice(0, 80).trimEnd() + "\u2026" : text || item.title || "";
+  // No recognised stage found — return empty so thread child rows show nothing in collapsed subtitle
+  return "";
 }
 
 /**
@@ -406,6 +406,34 @@ export function formatMeetingGroupHeader(meeting: FeedItem["meetings"]): string 
   }
 
   return cleaned;
+}
+
+/**
+ * Strip date noise from a meeting title for use as a compact thread child header label.
+ * Unlike formatMeetingGroupHeader, this REMOVES the municipality prefix (since
+ * thread child cards show the municipality badge separately).
+ * Also strips trailing bare dates like "Council Meeting February 23, 2026".
+ * Examples:
+ *   "February 18, 2026 Regular Council Meeting" → "Regular Council Meeting"
+ *   "CVRD Board Meeting – February 24, 2026"    → "Board Meeting"
+ *   "Council Meeting February 23, 2026"          → "Council Meeting"
+ *   "Courtenay Regular Council Meeting"          → "Regular Council Meeting"
+ */
+export function cleanMeetingTitle(title: string): string {
+  return title
+    // Leading "Month DD, YYYY " prefix
+    .replace(new RegExp(`^${_MONTHS_RE}\\s+\\d{1,2}[,\\s]+\\d{4}\\s*`, "i"), "")
+    // Trailing " – Month DD, YYYY" or " - Month DD, YYYY"
+    .replace(new RegExp(`\\s*[–\\-]\\s*${_MONTHS_RE}\\s+\\d{1,2}[,\\s]+\\d{4}$`, "i"), "")
+    // " for Month DD, YYYY" anywhere (Courtenay highlights style)
+    .replace(new RegExp(`\\s*\\bfor\\s+${_MONTHS_RE}\\s+\\d{1,2}[,\\s]+\\d{4}\\b`, "i"), "")
+    // Trailing bare "Month DD, YYYY" without separator (Cumberland: "Council Meeting February 23, 2026")
+    .replace(new RegExp(`\\s+${_MONTHS_RE}\\s+\\d{1,2}[,\\s]+\\d{4}$`, "i"), "")
+    // Leading municipality name + optional separator
+    .replace(/^(?:Courtenay|Comox|CVRD|Cumberland)\s*(?:[–\-]\s*)?/i, "")
+    // Leading "– " or "- " remnants
+    .replace(/^[–\-]\s*/, "")
+    .trim();
 }
 
 /** Abbreviated date for inline use, e.g. "Jan 21" */

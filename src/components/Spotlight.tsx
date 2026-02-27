@@ -221,7 +221,6 @@ function SpotlightStory({ item }: { item: FeedItem }) {
 
   const headline = deriveHeadline(item);
   const impactText = isActionableImpact(item.impact) ? item.impact!.trim() : null;
-  const summaryLine = getSummaryLine(item, complexity);
 
   const bylawNum = item.bylaw_number || extractBylawFromTitle(item.title ?? "");
   const anchor = bylawNum ? `#${shortName}_${bylawNum}` : `#${item.id}`;
@@ -237,35 +236,106 @@ function SpotlightStory({ item }: { item: FeedItem }) {
   const hasFeedback = (feedback?.feedback_count ?? 0) > 0;
   const signal: CommunitySignal | null = item.community_signal ?? null;
 
+  const badgesRow = (
+    <div className="mb-2 flex flex-wrap items-center gap-2">
+      <span className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${badgeClass}`}>
+        {shortName}
+      </span>
+      {topicLabel && (
+        <span className="text-xs font-medium text-[var(--text-tertiary)]">{topicLabel}</span>
+      )}
+    </div>
+  );
+
+  const cta = (
+    <div className="mt-3">
+      <Link href={anchor} className="text-sm font-medium text-[var(--accent)] hover:underline">
+        {ctaLabel} →
+      </Link>
+    </div>
+  );
+
+  // ── Simple: just headline + compact data (no summary paragraph) ──
+  if (complexity === "simple") {
+    return (
+      <div className="px-4 py-3 sm:px-5">
+        {badgesRow}
+        <h3 className="font-fraunces text-lg font-semibold leading-snug text-[var(--text-primary)]">
+          {headline}
+        </h3>
+        {/* Key stats as pills */}
+        {keyStats.length > 0 && (
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {keyStats.map((stat, i) => (
+              <span
+                key={i}
+                className={`rounded-full border px-2 py-0.5 text-xs font-medium ${statPillClass(stat.type)}`}
+              >
+                {stat.value} {stat.label}
+              </span>
+            ))}
+          </div>
+        )}
+        {/* Compact community count */}
+        {hasFeedback && feedback?.feedback_count ? (
+          <p className="mt-1 text-xs text-[var(--text-tertiary)]">
+            {feedback.feedback_count} community letters
+          </p>
+        ) : signal?.participant_count ? (
+          <p className="mt-1 text-xs text-[var(--text-tertiary)]">
+            {signal.participant_count.toLocaleString()} {signal.type === "survey" ? "survey responses" : "participants"}
+          </p>
+        ) : null}
+        {cta}
+      </div>
+    );
+  }
+
+  // ── Expert: full summary (not just first sentence) + complete community section ──
+  if (complexity === "expert") {
+    const fullSummary = getSummaryForComplexity(item, "expert");
+    return (
+      <div className="px-4 py-4 sm:px-5">
+        {badgesRow}
+        <h3 className="font-fraunces text-lg font-semibold leading-snug text-[var(--text-primary)]">
+          {headline}
+        </h3>
+        {impactText && (
+          <p className="mt-1 text-sm font-medium text-[var(--accent)]">{impactText}</p>
+        )}
+        <p className="mt-1 text-sm leading-relaxed text-[var(--text-secondary)]">
+          {fullSummary}
+        </p>
+        {keyStats.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {keyStats.map((stat, i) => (
+              <span
+                key={i}
+                className={`rounded-full border px-2 py-0.5 text-xs font-medium ${statPillClass(stat.type)}`}
+              >
+                {stat.value} {stat.label}
+              </span>
+            ))}
+          </div>
+        )}
+        {hasFeedback && feedback && <CommunityBar feedback={feedback} />}
+        {!hasFeedback && signal && <LightweightSignal signal={signal} />}
+        {cta}
+      </div>
+    );
+  }
+
+  // ── Standard (default): headline + impact + first-sentence summary ──
+  const summaryLine = getSummaryLine(item, complexity);
   return (
     <div className="px-4 py-4 sm:px-5">
-      {/* Badges row */}
-      <div className="mb-2 flex flex-wrap items-center gap-2">
-        <span
-          className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${badgeClass}`}
-        >
-          {shortName}
-        </span>
-        {topicLabel && (
-          <span className="text-xs font-medium text-[var(--text-tertiary)]">
-            {topicLabel}
-          </span>
-        )}
-      </div>
-
-      {/* Line 1: Headline — static, editorial, never changes with reading level */}
+      {badgesRow}
       <h3 className="font-fraunces text-lg font-semibold leading-snug text-[var(--text-primary)]">
         {headline}
       </h3>
-
-      {/* Line 2: Impact — static, green, only when actionable */}
       {impactText && (
-        <p className="mt-1 text-sm font-medium text-[var(--accent)]">
-          {impactText}
-        </p>
+        <p className="mt-1 text-sm font-medium text-[var(--accent)]">{impactText}</p>
       )}
-
-      {/* Line 3: First sentence of complexity-aware summary — changes with reading level */}
       <p
         key={complexity}
         className="mt-1 text-sm leading-relaxed text-[var(--text-secondary)]"
@@ -273,8 +343,6 @@ function SpotlightStory({ item }: { item: FeedItem }) {
       >
         {summaryLine}
       </p>
-
-      {/* Key stats pills */}
       {keyStats.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1.5">
           {keyStats.map((stat, i) => (
@@ -287,22 +355,9 @@ function SpotlightStory({ item }: { item: FeedItem }) {
           ))}
         </div>
       )}
-
-      {/* Community bar (full, from public_feedback pipeline) */}
       {hasFeedback && feedback && <CommunityBar feedback={feedback} />}
-
-      {/* Lightweight community signal (from AI extraction) */}
       {!hasFeedback && signal && <LightweightSignal signal={signal} />}
-
-      {/* CTA */}
-      <div className="mt-3">
-        <Link
-          href={anchor}
-          className="text-sm font-medium text-[var(--accent)] hover:underline"
-        >
-          {ctaLabel} →
-        </Link>
-      </div>
+      {cta}
     </div>
   );
 }
