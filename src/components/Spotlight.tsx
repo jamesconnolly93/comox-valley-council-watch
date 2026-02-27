@@ -11,6 +11,7 @@ import {
 } from "@/lib/feed";
 import { useComplexity } from "@/lib/complexity-context";
 import { COMPLEXITY_LEVELS } from "./ComplexitySlider";
+import { StructuredFindings } from "./StructuredFindings";
 
 function getSummaryForComplexity(
   item: FeedItem,
@@ -57,12 +58,10 @@ function deriveHeadline(item: FeedItem): string {
 }
 
 /**
- * Derive the subtitle (changes with reading level).
- * Priority: actionable impact text → first sentence of summary → truncated summary.
+ * The complexity-aware summary sentence shown in Line 3.
+ * Changes with reading level; animates on transition.
  */
-function getSubtitle(item: FeedItem, complexity: "simple" | "standard" | "expert"): string {
-  const impactText = isActionableImpact(item.impact) ? item.impact!.trim() : null;
-  if (impactText) return impactText;
+function getSummaryLine(item: FeedItem, complexity: "simple" | "standard" | "expert"): string {
   const summary = getSummaryForComplexity(item, complexity);
   return getFirstSentence(summary) || (item.summary ?? "").slice(0, 200);
 }
@@ -214,25 +213,30 @@ function CommunityBar({ feedback }: { feedback: NonNullable<ReturnType<typeof no
 }
 
 function LightweightSignal({ signal }: { signal: CommunitySignal }) {
-  if (!signal.summary) return null;
+  // If signal has structured positions, delegate to StructuredFindings
+  const hasPositions = Array.isArray(signal.positions) && signal.positions.length > 0;
   return (
     <div className="mt-3">
-      <p className="text-sm text-[var(--text-secondary)]">
-        <span className="font-medium text-[var(--text-primary)]">
-          {signal.participant_count ? `${signal.participant_count.toLocaleString()} ` : ""}
-          {signal.type === "survey"
-            ? "survey respondents"
-            : signal.type === "delegation"
-            ? "delegations"
-            : signal.type === "petition"
-            ? "petition signatures"
-            : signal.type === "service_delivery"
-            ? "calls/events"
-            : "participants"}
-          :
-        </span>{" "}
-        {signal.summary}
-      </p>
+      {hasPositions ? (
+        <StructuredFindings signal={signal} />
+      ) : signal.summary ? (
+        <p className="text-sm text-[var(--text-secondary)]">
+          <span className="font-medium text-[var(--text-primary)]">
+            {signal.participant_count ? `${signal.participant_count.toLocaleString()} ` : ""}
+            {signal.type === "survey"
+              ? "survey respondents"
+              : signal.type === "delegation"
+              ? "delegations"
+              : signal.type === "petition"
+              ? "petition signatures"
+              : signal.type === "service_delivery"
+              ? "calls/events"
+              : "participants"}
+            :
+          </span>{" "}
+          {signal.summary}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -244,7 +248,8 @@ function SpotlightStory({ item }: { item: FeedItem }) {
   const badgeClass = municipalityBadgeClass(shortName);
 
   const headline = deriveHeadline(item);
-  const subtitle = getSubtitle(item, complexity);
+  const impactText = isActionableImpact(item.impact) ? item.impact!.trim() : null;
+  const summaryLine = getSummaryLine(item, complexity);
 
   const bylawNum = item.bylaw_number || extractBylawFromTitle(item.title ?? "");
   const anchor = bylawNum ? `#${shortName}_${bylawNum}` : `#${item.id}`;
@@ -276,18 +281,25 @@ function SpotlightStory({ item }: { item: FeedItem }) {
         )}
       </div>
 
-      {/* Headline — static, editorial, never changes with reading level */}
+      {/* Line 1: Headline — static, editorial, never changes with reading level */}
       <h3 className="font-fraunces text-lg font-semibold leading-snug text-[var(--text-primary)]">
         {headline}
       </h3>
 
-      {/* Subtitle — changes with reading level (impact text first, then summary sentence) */}
+      {/* Line 2: Impact — static, green, only when actionable */}
+      {impactText && (
+        <p className="mt-1 text-sm font-medium text-[var(--accent)]">
+          {impactText}
+        </p>
+      )}
+
+      {/* Line 3: First sentence of complexity-aware summary — changes with reading level */}
       <p
         key={complexity}
         className="mt-1 text-sm leading-relaxed text-[var(--text-secondary)]"
         style={{ animation: "fade-in 0.15s ease-out" }}
       >
-        {subtitle}
+        {summaryLine}
       </p>
 
       {/* Key stats pills */}

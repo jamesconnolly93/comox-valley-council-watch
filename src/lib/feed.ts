@@ -11,6 +11,13 @@ export type KeyStat = {
   type: "money" | "percentage" | "count" | "other";
 };
 
+export type CommunitySignalPosition = {
+  label: string;
+  detail: string;
+  metric: string | null;
+  stance: "support" | "oppose" | "neutral" | "finding";
+};
+
 export type CommunitySignal = {
   type:
     | "letters"
@@ -24,6 +31,7 @@ export type CommunitySignal = {
   participant_count: number | null;
   summary: string | null;
   sentiment: "mixed" | "mostly_support" | "mostly_oppose" | "neutral" | null;
+  positions?: CommunitySignalPosition[] | null;
 };
 
 export type PublicFeedbackRow = {

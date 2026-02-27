@@ -197,10 +197,29 @@ function spotlightScore(item: FeedItem, reactionCounts: Map<string, number>): nu
   )
     score -= 20;
 
-  // Lightweight community signal (surveys, delegations, etc.)
+  // Lightweight community signal — weighted by type, capped so service_delivery counts
+  // (e.g. 1,306 calls) don't dominate over genuine community engagement
   const signal = item.community_signal;
-  if (signal?.participant_count && signal.participant_count > 10) {
-    score += signal.participant_count;
+  if (signal) {
+    const count = signal.participant_count ?? 0;
+    switch (signal.type) {
+      case "public_hearing":
+      case "letters":
+        score += Math.min(count, 100) + 25;
+        break;
+      case "survey":
+      case "engagement":
+        score += Math.min(count, 100) + 20;
+        break;
+      case "delegation":
+        score += 15;
+        break;
+      case "service_delivery":
+        score += 15;
+        break;
+      default:
+        score += 10;
+    }
   }
 
   // Concrete data bonus

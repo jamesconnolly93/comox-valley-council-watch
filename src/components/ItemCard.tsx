@@ -17,6 +17,7 @@ import {
 import { useComplexity } from "@/lib/complexity-context";
 import { CommunityVoices } from "./CommunityVoices";
 import { ReactionButton } from "./ReactionButton";
+import { StructuredFindings } from "./StructuredFindings";
 
 const TAG_LIMIT = 5;
 
@@ -371,41 +372,30 @@ export function ItemCard({
               </div>
             )}
 
-            {/* Full key stats (expanded — all stats) */}
-            {!isThreadChild && keyStats.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {keyStats.map((stat, i) => (
-                  <span
-                    key={i}
-                    className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${statPillClass(stat.type)}`}
-                  >
-                    {stat.value} {stat.label}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* Reaction button */}
-            <div onClick={(e) => e.stopPropagation()}>
-              <ReactionButton itemId={item.id} />
-            </div>
-
             {/* Community Voices (full, from public_feedback pipeline) */}
             {feedback && <CommunityVoices data={feedback} />}
 
-            {/* Community Signal (lightweight, from AI extraction — shown when no full feedback) */}
-            {!hasFeedback && communitySignal?.summary && (
-              <div className="rounded-r-lg border-l-2 border-blue-200 bg-blue-50/50 py-2 pl-3 pr-3">
-                <p className="text-xs font-medium text-blue-700">
-                  {communitySignal.participant_count
-                    ? communitySignalBadgeLabel(communitySignal)
-                    : "Community input"}
-                </p>
-                <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
-                  {communitySignal.summary}
-                </p>
-              </div>
+            {/* Community Signal (from AI extraction — shown when no full feedback) */}
+            {!hasFeedback && communitySignal && (
+              <StructuredFindings signal={communitySignal} />
             )}
+
+            {/* Reaction + Share row */}
+            <div
+              className="flex items-center justify-between"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ReactionButton itemId={item.id} />
+              <Link
+                href={`/item/${item.id}`}
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1 text-xs text-[var(--text-tertiary)] transition-colors hover:text-[var(--accent)]"
+                title="Share this item"
+              >
+                <ShareIcon className="h-3.5 w-3.5" />
+                Share
+              </Link>
+            </div>
 
             {/* Category + tag pills */}
             {(categories.length > 0 || tags.length > 0) && (
@@ -437,19 +427,6 @@ export function ItemCard({
                 )}
               </div>
             )}
-
-            {/* Share link */}
-            <div className="flex justify-end">
-              <Link
-                href={`/item/${item.id}`}
-                onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-1 text-xs text-[var(--text-tertiary)] transition-colors hover:text-[var(--accent)]"
-                title="Share this item"
-              >
-                <ShareIcon className="h-3.5 w-3.5" />
-                Share
-              </Link>
-            </div>
           </div>
         </div>
       </div>

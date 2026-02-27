@@ -18,7 +18,15 @@ Given a council meeting item, return ONLY a JSON object with no markdown formatt
     "type": "letters|survey|delegation|petition|public_hearing|engagement|service_delivery|other",
     "participant_count": 123,
     "summary": "One sentence describing the participation or service data.",
-    "sentiment": "mixed|mostly_support|mostly_oppose|neutral|null"
+    "sentiment": "mixed|mostly_support|mostly_oppose|neutral|null",
+    "positions": [
+      {
+        "label": "Short description of the finding, preference, or outcome (max 8 words)",
+        "detail": "One sentence elaboration",
+        "metric": "The key number or qualifier — e.g. '81%', '~52 letters', 'Top priority', '1,306 calls'",
+        "stance": "support|oppose|neutral|finding"
+      }
+    ]
   },
   "categories": ["category_slug"],
   "tags": ["specific_topic_tag"],
@@ -40,6 +48,7 @@ Rules:
   • Any reference to "public input", "community feedback", "resident comments" → type "engagement"
   For participant_count: use the most prominent number (calls handled, respondents, letters received, events attended, etc.).
   IMPORTANT: err on the side of INCLUDING data. Only return null if the item is purely procedural with zero mention of any community interaction, public participation, or service delivery numbers.
+- positions: Capture 2-5 distinct findings, preferences, outcomes, or data points from the community participation or report. Think of these as the key takeaways a journalist would pull out. For surveys/engagement: what did people prefer, what were top concerns, what tradeoffs did they make? For service_delivery: what are the headline metrics? For letters/public_hearing: what were the main themes of support or opposition? Use "finding" stance for neutral data points, "support"/"oppose" for clear positions, "neutral" for mixed/unclear. Return [] if you cannot identify distinct findings.
 - For bylaw_number: extract just the numeric identifier (e.g. "3211" from "Bylaw No. 3211", "2025-15" from "Bylaw 2025-15"). Return null if no bylaw.
 
 Example for the Financial Plan Bylaw:
@@ -52,10 +61,10 @@ Example for the Financial Plan Bylaw:
 - community_signal: null (no participation data explicitly mentioned in the financial plan bylaw itself)
 
 Example for a Budget Engagement report mentioning "54 residents completed the simulator":
-- community_signal: {"type":"survey","participant_count":54,"summary":"54 residents used the online budget simulator, prioritizing police funding and reserve funds while suggesting cuts to recreation.","sentiment":"mixed"}
+- community_signal: {"type":"survey","participant_count":54,"summary":"54 residents used the online budget simulator, prioritizing police funding and reserve funds while suggesting cuts to recreation.","sentiment":"mixed","positions":[{"label":"Increase police funding","detail":"Residents ranked police as the top service to receive more funding.","metric":"Top priority","stance":"finding"},{"label":"Build reserve funds","detail":"Maintaining healthy reserves was the second most common preference.","metric":"2nd priority","stance":"finding"},{"label":"Cut recreation spending","detail":"Parks and recreation was the most common area residents suggested reducing.","metric":"Most cuts suggested","stance":"finding"}]}
 
 Example for a Fire Department annual report mentioning "1,306 emergency calls":
-- community_signal: {"type":"service_delivery","participant_count":1306,"summary":"Courtenay Fire responded to 1,306 emergency calls with 13,700 volunteer hours logged across the year.","sentiment":null}
+- community_signal: {"type":"service_delivery","participant_count":1306,"summary":"Courtenay Fire responded to 1,306 emergency calls with 13,700 volunteer hours logged across the year.","sentiment":null,"positions":[{"label":"Emergency calls handled","detail":"Courtenay Fire Department responded to all emergency incidents in the service area.","metric":"1,306 calls","stance":"finding"},{"label":"Volunteer hours contributed","detail":"Members volunteered 13,700 hours of service over the year.","metric":"13,700 hrs","stance":"finding"},{"label":"Safety inspections conducted","detail":"The department completed fire safety inspections across commercial and residential properties.","metric":"1,800 inspections","stance":"finding"}]}
 
 Categories (use 1-3): development, infrastructure, finance, housing, environment, parks_recreation, governance, community, safety, other
 
