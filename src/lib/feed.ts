@@ -157,6 +157,65 @@ export function isHighImpact(impact: string | null | undefined): boolean {
   );
 }
 
+/** Items that appeared on the agenda but have no useful content */
+export function isPlaceholderItem(item: FeedItem): boolean {
+  const markers = [
+    "no attached text",
+    "no information about it",
+    "placeholder",
+    "no substantive discussion",
+    "no details available",
+    "appears on the agenda as a placeholder",
+  ];
+  const text = ((item.summary_simple || item.summary) ?? "").toLowerCase();
+  return markers.some((m) => text.includes(m));
+}
+
+/** Client-side score for sorting items within meeting groups (no reactions needed). */
+export function scoreItemForDisplay(item: FeedItem): number {
+  let score = 0;
+  const fb = normaliseFeedback(item.public_feedback);
+  const impact = item.impact?.trim() ?? "";
+
+  if (fb?.feedback_count) score += fb.feedback_count * 2;
+  if (isHighImpact(impact)) score += 50;
+  if (impact.includes("$") && /\d/.test(impact)) score += 40;
+  if (impact.startsWith("Your")) score += 30;
+
+  const impactLower = impact.toLowerCase();
+  if (
+    impactLower.startsWith("no direct impact") ||
+    impactLower.startsWith("no immediate impact")
+  )
+    score -= 20;
+
+  const signal = item.community_signal;
+  if (signal) {
+    const count = signal.participant_count ?? 0;
+    switch (signal.type) {
+      case "public_hearing":
+      case "letters":
+        score += Math.min(count, 100) + 25;
+        break;
+      case "survey":
+      case "engagement":
+        score += Math.min(count, 100) + 20;
+        break;
+      case "delegation":
+      case "service_delivery":
+        score += 15;
+        break;
+      default:
+        score += 10;
+    }
+  }
+
+  if (Array.isArray(item.key_stats) && item.key_stats.length > 0) score += 10;
+  if (item.is_significant) score += 15;
+
+  return score;
+}
+
 /** Only show impactful callouts; hide generic "no impact" variants */
 export function isActionableImpact(impact: string | null | undefined): boolean {
   if (!impact) return false;

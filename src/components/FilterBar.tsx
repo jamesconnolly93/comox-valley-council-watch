@@ -122,7 +122,7 @@ export function FilterBar() {
 
       {/* Row 3: Reading level — prominent full-width segmented control */}
       <div className="flex items-center gap-3">
-        <span className="shrink-0 text-sm text-[var(--text-tertiary)]">Reading level</span>
+        <span className="shrink-0 text-sm text-[var(--text-tertiary)]">Detail</span>
         <div className="grid flex-1 grid-cols-3 overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-0.5">
           {COMPLEXITY_LEVELS.map((level) => (
             <button
@@ -130,7 +130,6 @@ export function FilterBar() {
               type="button"
               onClick={() => setComplexity(level.value)}
               aria-pressed={complexity === level.value}
-              title={level.desc}
               className={`rounded-md py-1 text-xs font-medium transition-all duration-150 ${
                 complexity === level.value
                   ? "bg-[var(--accent)] text-white shadow-sm"

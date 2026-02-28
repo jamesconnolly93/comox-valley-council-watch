@@ -7,6 +7,7 @@ import {
   categoryLabel,
   isActionableImpact,
   isHighImpact,
+  isPlaceholderItem,
   municipalityBadgeClass,
   normaliseFeedback,
   deriveReadingStatus,
@@ -174,6 +175,7 @@ export function ItemCard({
   const isSimple = complexity === "simple";
   const isExpert = complexity === "expert";
   const isExpanded = isExpert || expanded;
+  const isPlaceholder = isPlaceholderItem(item);
 
   const shortName = item.meetings?.municipalities?.short_name ?? "Unknown";
   const badgeClass = municipalityBadgeClass(shortName);
@@ -195,9 +197,13 @@ export function ItemCard({
   // Collapsed subtitle: reading status (thread children) or impact snippet (regular)
   // Only used in Standard mode — Expert shows everything, Simple shows nothing
   const readingStatus = isThreadChild ? (deriveReadingStatus(item) || null) : null;
-  // Thread children: headline is the distinguishing element; fall back to reading status
+  // Summary snippet — first 80 chars of simple/standard summary for thread child differentiation
+  const summarySnippet = isThreadChild
+    ? ((item.summary_simple || item.summary)?.slice(0, 80)?.trim() || null)
+    : null;
+  // Thread children: headline → readingStatus → summary snippet → fallback label
   const threadSubtitle = isThreadChild
-    ? (item.headline?.trim() || readingStatus || null)
+    ? (item.headline?.trim() || readingStatus || summarySnippet || "Details available")
     : null;
   const collapsedSubtitle = !isExpert
     ? (isThreadChild ? threadSubtitle : (impactText ? firstSentence(impactText) : null))
@@ -221,6 +227,9 @@ export function ItemCard({
     : item.is_significant && !isThreadChild
     ? "border border-amber-200/70"
     : "border border-[var(--border)]";
+
+  // Hide zero-value placeholder items in Simple and Standard modes
+  if (!isExpert && isPlaceholder) return null;
 
   // ====== SIMPLE MODE: single compact row, entire card is a link ======
   if (isSimple) {
@@ -257,9 +266,9 @@ export function ItemCard({
               ) : (
                 <span className="block truncate text-sm text-[var(--text-secondary)]">
                   {threadPrimaryLabel}
-                  {readingStatus && (
+                  {(readingStatus || summarySnippet) && (
                     <span className="ml-2 font-medium text-[var(--text-primary)]">
-                      · {readingStatus}
+                      · {readingStatus || summarySnippet}
                     </span>
                   )}
                 </span>
@@ -281,7 +290,7 @@ export function ItemCard({
   return (
     <article
       id={item.id}
-      className={`group relative scroll-mt-24 overflow-hidden rounded-xl bg-[var(--surface)] shadow-sm transition-shadow duration-200 hover:shadow-md ${borderClass}`}
+      className={`group relative scroll-mt-24 overflow-hidden rounded-xl bg-[var(--surface)] shadow-sm transition-shadow duration-200 hover:shadow-md ${borderClass}${isExpert && isPlaceholder ? " opacity-50" : ""}`}
     >
       {/* Header — button only in Standard mode */}
       <div
@@ -330,6 +339,13 @@ export function ItemCard({
           {!hasFeedback && !isThreadChild && communitySignal?.participant_count && (
             <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
               {communitySignalBadgeLabel(communitySignal)}
+            </span>
+          )}
+
+          {/* No-details badge — Expert mode placeholders only */}
+          {isExpert && isPlaceholder && (
+            <span className="shrink-0 rounded border border-[var(--border)] bg-[var(--surface-elevated)] px-2 py-0.5 text-xs text-[var(--text-tertiary)]">
+              No details
             </span>
           )}
 
