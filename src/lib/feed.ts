@@ -385,6 +385,8 @@ export function formatMeetingGroupHeader(meeting: FeedItem["meetings"]): string 
   const title = meeting?.title ?? "";
   const shortName = meeting?.municipalities?.short_name ?? "";
 
+  const originalHasHighlights = /highlights/i.test(title);
+
   let cleaned = title
     // Leading "Month DD, YYYY " prefix
     .replace(new RegExp(`^${_MONTHS_RE}\\s+\\d{1,2}[,\\s]+\\d{4}\\s*`, "i"), "")
@@ -394,9 +396,12 @@ export function formatMeetingGroupHeader(meeting: FeedItem["meetings"]): string 
     .replace(new RegExp(`\\s*\\bfor\\s+${_MONTHS_RE}\\s+\\d{1,2}[,\\s]+\\d{4}\\b`, "i"), "")
     // Trailing bare "Month DD, YYYY" (Cumberland/Comox: "Council Meeting February 23, 2026")
     .replace(new RegExp(`\\s+${_MONTHS_RE}\\s+\\d{1,2}[,\\s]+\\d{4}$`, "i"), "")
-    // Normalise "meeting highlights" → "Highlights"
-    .replace(/\bmeeting highlights\b/gi, "Highlights")
     .trim();
+
+  // Only normalise "meeting highlights" → "Highlights" when the original title contained "highlights"
+  if (originalHasHighlights) {
+    cleaned = cleaned.replace(/\bmeeting highlights\b/gi, "Highlights");
+  }
 
   if (!cleaned) cleaned = "Council Meeting";
 

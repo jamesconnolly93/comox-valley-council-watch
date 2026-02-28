@@ -17,7 +17,7 @@ const sourceSans = Source_Sans_3({
 
 export const metadata: Metadata = {
   title: "Comox Valley Council Watch",
-  description: "Never miss a decision that matters to you",
+  description: "AI-powered summaries of council decisions across Courtenay, Comox, Cumberland & CVRD",
 };
 
 export default function RootLayout({

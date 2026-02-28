@@ -131,7 +131,7 @@ export function FilterBar() {
               onClick={() => setComplexity(level.value)}
               aria-pressed={complexity === level.value}
               title={level.desc}
-              className={`rounded-md py-1.5 text-sm font-medium transition-all duration-150 ${
+              className={`rounded-md py-1 text-xs font-medium transition-all duration-150 ${
                 complexity === level.value
                   ? "bg-[var(--accent)] text-white shadow-sm"
                   : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"

@@ -222,6 +222,16 @@ export default async function HomePage({
                 sort={sort}
               />
             </Suspense>
+
+            {/* Bottom email CTA */}
+            <div className="border-t border-[var(--border)] pt-8 pb-4">
+              <div className="mx-auto max-w-md text-center">
+                <p className="mb-3 text-sm text-[var(--text-tertiary)]">
+                  Stay informed — get a weekly summary of council decisions.
+                </p>
+                <DigestSignup compact />
+              </div>
+            </div>
           </div>
         </ComplexityProviderWrapper>
       </main>

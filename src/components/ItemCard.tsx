@@ -195,8 +195,12 @@ export function ItemCard({
   // Collapsed subtitle: reading status (thread children) or impact snippet (regular)
   // Only used in Standard mode — Expert shows everything, Simple shows nothing
   const readingStatus = isThreadChild ? (deriveReadingStatus(item) || null) : null;
+  // Thread children: headline is the distinguishing element; fall back to reading status
+  const threadSubtitle = isThreadChild
+    ? (item.headline?.trim() || readingStatus || null)
+    : null;
   const collapsedSubtitle = !isExpert
-    ? (readingStatus ?? (impactText ? firstSentence(impactText) : null))
+    ? (isThreadChild ? threadSubtitle : (impactText ? firstSentence(impactText) : null))
     : null;
 
   // Thread child header: "Feb 18, 2026 — Regular Council Meeting"
@@ -246,14 +250,20 @@ export function ItemCard({
           )}
           <div className="min-w-0 flex-1 overflow-hidden">
             {isThreadChild ? (
-              <span className="block truncate text-sm text-[var(--text-secondary)]">
-                {threadPrimaryLabel}
-                {readingStatus && (
-                  <span className="ml-2 font-medium text-[var(--text-primary)]">
-                    · {readingStatus}
-                  </span>
-                )}
-              </span>
+              item.headline?.trim() ? (
+                <span className="block truncate font-fraunces text-base font-semibold text-[var(--text-primary)]">
+                  {item.headline.trim()}
+                </span>
+              ) : (
+                <span className="block truncate text-sm text-[var(--text-secondary)]">
+                  {threadPrimaryLabel}
+                  {readingStatus && (
+                    <span className="ml-2 font-medium text-[var(--text-primary)]">
+                      · {readingStatus}
+                    </span>
+                  )}
+                </span>
+              )
             ) : (
               <span className="block truncate font-fraunces text-base font-semibold text-[var(--text-primary)]">
                 {displayTitle}
