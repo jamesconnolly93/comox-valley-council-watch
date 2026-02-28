@@ -21,7 +21,8 @@ import { CommunityVoices } from "./CommunityVoices";
 import { ReactionButton } from "./ReactionButton";
 import { StructuredFindings } from "./StructuredFindings";
 
-const TAG_LIMIT = 5;
+const COMBINED_PILL_LIMIT = 5;
+const DECISION_TRUNCATE = 200;
 
 function formatTag(tag: string): string {
   return tag
@@ -46,6 +47,21 @@ function getSummaryForComplexity(
 function firstSentence(text: string): string {
   const m = text.match(/^[^.!?]+[.!?]/);
   return m ? m[0].trim() : text.slice(0, 120).trim();
+}
+
+/**
+ * In Expert mode, if the impact text and summary start the same way,
+ * strip the duplicate first sentence from the summary.
+ */
+function deduplicateImpactFromSummary(impact: string, summary: string): string {
+  if (!impact || !summary) return summary;
+  const impNorm = impact.toLowerCase().replace(/\s+/g, " ").trim().slice(0, 60);
+  const sumNorm = summary.toLowerCase().replace(/\s+/g, " ").trim().slice(0, 60);
+  if (sumNorm.startsWith(impNorm)) {
+    const m = summary.match(/^[^.!?]+[.!?]\s*/);
+    return m ? summary.slice(m[0].length).trim() : summary;
+  }
+  return summary;
 }
 
 // ---- Icons ----
@@ -171,6 +187,8 @@ export function ItemCard({
   hideMunicipality?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [showAllTags, setShowAllTags] = useState(false);
+  const [showFullDecision, setShowFullDecision] = useState(false);
   const { complexity } = useComplexity();
 
   const isSimple = complexity === "simple";
@@ -186,13 +204,22 @@ export function ItemCard({
 
   const categories = item.categories ?? (item.category ? [item.category] : []);
   const tags = item.tags ?? [];
-  const visibleTags = tags.slice(0, TAG_LIMIT);
-  const remaining = tags.length - TAG_LIMIT;
+  const allPills = [
+    ...categories.map((c) => ({ kind: "category" as const, value: c })),
+    ...tags.map((t) => ({ kind: "tag" as const, value: t })),
+  ];
+  const visiblePills = showAllTags ? allPills : allPills.slice(0, COMBINED_PILL_LIMIT);
+  const hiddenPillCount = allPills.length - COMBINED_PILL_LIMIT;
   const keyStats: KeyStat[] = Array.isArray(item.key_stats) ? item.key_stats : [];
   const communitySignal: CommunitySignal | null = item.community_signal ?? null;
 
   const displaySummary = getSummaryForComplexity(item, complexity);
   const impactText = isActionableImpact(item.impact) ? item.impact!.trim() : null;
+  // Expert mode: strip first sentence of summary if it repeats the impact text
+  const cleanSummary =
+    isExpert && impactText
+      ? deduplicateImpactFromSummary(impactText, displaySummary)
+      : displaySummary;
   const highImpact =
     !isThreadChild &&
     (isHighImpact(item.impact) ||
@@ -287,10 +314,17 @@ export function ItemCard({
                 </span>
               )
             ) : (
-              /* Simple: regular card headline — lighter font for scan mode */
-              <span className="block truncate text-base font-medium text-[var(--text-primary)]">
-                {displayTitle}
-              </span>
+              /* Simple: regular card — headline + optional impact teaser */
+              <>
+                <span className="block truncate text-base font-medium text-[var(--text-primary)]">
+                  {displayTitle}
+                </span>
+                {impactText && (
+                  <span className="block truncate text-xs text-[var(--text-tertiary)]">
+                    {impactText.slice(0, 80)}
+                  </span>
+                )}
+              </>
             )}
           </div>
           {rightBadge}
@@ -412,7 +446,7 @@ export function ItemCard({
               className="leading-relaxed text-[var(--text-secondary)]"
               style={{ animation: "fade-in 0.15s ease-out" }}
             >
-              {displaySummary}
+              {cleanSummary}
             </p>
 
             {/* Key stats — quiet inline text */}
@@ -429,21 +463,40 @@ export function ItemCard({
             )}
 
             {/* Decision */}
-            {item.decision && (
-              <div className="rounded-lg border-l-2 border-[var(--accent)] bg-[var(--accent-light)]/50 py-2 pl-3 pr-3">
-                <div className="flex items-start gap-2">
-                  <GavelIcon className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
-                  <div>
-                    <span className="text-xs font-medium text-[var(--accent)]">
-                      Decision
-                    </span>
-                    <p className="mt-0.5 text-sm italic text-[var(--text-primary)]">
-                      {item.decision}
-                    </p>
+            {item.decision && (() => {
+              const isLong = item.decision.length > DECISION_TRUNCATE;
+              const displayDecision =
+                isLong && !showFullDecision
+                  ? item.decision.slice(0, DECISION_TRUNCATE).trimEnd() + "…"
+                  : item.decision;
+              return (
+                <div className="rounded-lg border-l-2 border-[var(--accent)] bg-[var(--accent-light)]/50 py-2 pl-3 pr-3">
+                  <div className="flex items-start gap-2">
+                    <GavelIcon className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
+                    <div>
+                      <span className="text-xs font-medium text-[var(--accent)]">
+                        Decision
+                      </span>
+                      <p className="mt-0.5 text-sm italic text-[var(--text-primary)]">
+                        {displayDecision}
+                      </p>
+                      {isLong && !showFullDecision && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowFullDecision(true);
+                          }}
+                          className="mt-1 text-xs text-[var(--accent)] hover:underline"
+                        >
+                          Show full decision
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Community Voices (full, from public_feedback pipeline) */}
             {feedback && <CommunityVoices data={feedback} />}
@@ -470,33 +523,41 @@ export function ItemCard({
               </Link>
             </div>
 
-            {/* Category + tag pills */}
-            {(categories.length > 0 || tags.length > 0) && (
+            {/* Category + tag pills — capped at 5 total, categories first */}
+            {allPills.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {categories.map((cat, i) => (
-                  <span
-                    key={cat}
-                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      i === 0
-                        ? "bg-[var(--accent-light)] text-[var(--accent)]"
-                        : "bg-[var(--surface-elevated)] text-[var(--text-secondary)]"
-                    }`}
-                  >
-                    {categoryLabel(cat)}
-                  </span>
+                {visiblePills.map((pill, i) => (
+                  pill.kind === "category" ? (
+                    <span
+                      key={`cat-${pill.value}`}
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        i === 0
+                          ? "bg-[var(--accent-light)] text-[var(--accent)]"
+                          : "bg-[var(--surface-elevated)] text-[var(--text-secondary)]"
+                      }`}
+                    >
+                      {categoryLabel(pill.value)}
+                    </span>
+                  ) : (
+                    <span
+                      key={`tag-${pill.value}`}
+                      className="rounded-full bg-[var(--surface-elevated)] px-2 py-0.5 text-xs text-[var(--text-tertiary)]"
+                    >
+                      {formatTag(pill.value)}
+                    </span>
+                  )
                 ))}
-                {visibleTags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full bg-[var(--surface-elevated)] px-2 py-0.5 text-xs text-[var(--text-tertiary)]"
+                {!showAllTags && hiddenPillCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowAllTags(true);
+                    }}
+                    className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
                   >
-                    {formatTag(tag)}
-                  </span>
-                ))}
-                {remaining > 0 && (
-                  <span className="text-xs text-[var(--text-tertiary)]">
-                    +{remaining} more
-                  </span>
+                    +{hiddenPillCount} more
+                  </button>
                 )}
               </div>
             )}

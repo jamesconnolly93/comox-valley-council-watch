@@ -2,7 +2,7 @@
 
 import { ItemCard } from "./ItemCard";
 import type { IssueGroup } from "@/lib/feed";
-import { pluralize } from "@/lib/feed";
+import { pluralize, isPlaceholderItem } from "@/lib/feed";
 import { useComplexity } from "@/lib/complexity-context";
 
 /** Number of whole months between two ISO date strings */
@@ -13,14 +13,15 @@ function monthSpan(earliest: string, latest: string): number {
   return (b[0] - a[0]) * 12 + (b[1] - a[1]);
 }
 
-function threadSummaryLine(group: IssueGroup): string {
-  const count = group.items.length;
+/** Summary line showing non-placeholder item count. Returns "" if ≤1 visible item. */
+function threadSummaryLine(group: IssueGroup, visibleCount: number): string {
+  if (visibleCount <= 1) return "";
   const earliest = group.items[group.items.length - 1]?.meetings?.date ?? "";
   const span = monthSpan(earliest, group.latestDate);
   if (span >= 1) {
-    return `${count} reading${count === 1 ? "" : "s"} across ${span} month${span === 1 ? "" : "s"}`;
+    return `${visibleCount} reading${visibleCount === 1 ? "" : "s"} across ${span} month${span === 1 ? "" : "s"}`;
   }
-  return `${count} meeting${count === 1 ? "" : "s"}`;
+  return `${visibleCount} meeting${visibleCount === 1 ? "" : "s"}`;
 }
 
 function LettersIcon({ className }: { className?: string }) {
@@ -44,7 +45,8 @@ function LettersIcon({ className }: { className?: string }) {
 export function IssueGroupSection({ group }: { group: IssueGroup }) {
   const { complexity } = useComplexity();
   const isExpert = complexity === "expert";
-  const summary = threadSummaryLine(group);
+  const visibleCount = group.items.filter((item) => !isPlaceholderItem(item)).length;
+  const summary = threadSummaryLine(group, visibleCount);
   const totalLetters = group.totalFeedbackCount;
 
   return (
@@ -58,8 +60,12 @@ export function IssueGroupSection({ group }: { group: IssueGroup }) {
             </h2>
             <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-[var(--text-tertiary)]">
               <span>Bylaw {group.bylawNum}</span>
-              <span>·</span>
-              <span>{summary}</span>
+              {summary && (
+                <>
+                  <span>·</span>
+                  <span>{summary}</span>
+                </>
+              )}
               {totalLetters > 0 && (
                 <>
                   <span>·</span>
@@ -78,7 +84,9 @@ export function IssueGroupSection({ group }: { group: IssueGroup }) {
               <span className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
                 Bylaw {group.bylawNum}
               </span>
-              <span className="text-xs text-[var(--text-tertiary)]">{summary}</span>
+              {summary && (
+                <span className="text-xs text-[var(--text-tertiary)]">{summary}</span>
+              )}
 
               {totalLetters > 0 && (
                 <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">

@@ -164,10 +164,11 @@ export default async function HomePage({
     typeof params?.category === "string" ? params.category : null;
   const sort = typeof params?.sort === "string" ? params.sort : null;
 
-  const showSpotlight =
-    (!municipality || municipality === "all") &&
-    (!category || category === "all");
-  const spotlightItems = showSpotlight ? await getSpotlightItems() : [];
+  // Show spotlight unless a category filter is active; municipality filter narrows it instead of hiding it
+  const showSpotlight = !category || category === "all";
+  const spotlightItems = showSpotlight
+    ? await getSpotlightItems(2, municipality)
+    : [];
 
   return (
     <div className="min-h-screen bg-[var(--background)]">

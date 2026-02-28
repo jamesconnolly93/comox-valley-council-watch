@@ -233,19 +233,31 @@ function spotlightScore(item: FeedItem, reactionCounts: Map<string, number>): nu
  * Scored by: community letters + reactions×5 + high-impact bonus.
  * Only items from the last 30 days; bylaw thread siblings deduplicated.
  */
-export async function getSpotlightItems(limit = 2): Promise<FeedItem[]> {
+export async function getSpotlightItems(
+  limit = 2,
+  municipality?: string | null
+): Promise<FeedItem[]> {
   const supabase = await createClient();
 
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - 30);
   const cutoffStr = cutoff.toISOString().slice(0, 10);
 
-  // Find recent meetings
-  const { data: recentMeetings } = await supabase
-    .from("meetings")
-    .select("id")
-    .gte("date", cutoffStr);
+  // Find recent meetings, optionally filtered by municipality
+  let meetingsQuery = supabase.from("meetings").select("id").gte("date", cutoffStr);
 
+  if (municipality && municipality !== "all") {
+    const { data: mun } = await supabase
+      .from("municipalities")
+      .select("id")
+      .eq("short_name", municipality)
+      .single();
+    if (mun) {
+      meetingsQuery = meetingsQuery.eq("municipality_id", mun.id);
+    }
+  }
+
+  const { data: recentMeetings } = await meetingsQuery;
   const meetingIds = (recentMeetings ?? []).map((m) => m.id);
 
   const selectCols = `
