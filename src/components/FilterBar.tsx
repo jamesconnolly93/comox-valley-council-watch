@@ -18,6 +18,34 @@ export function FilterBar() {
   const [isPending, startTransition] = useTransition();
   const { complexity, setComplexity } = useComplexity();
 
+  /** Change detail level while preserving the user's scroll position */
+  function handleComplexityChange(newLevel: Complexity) {
+    // Capture the feed element closest to the top of the visible viewport
+    const cards = document.querySelectorAll("[data-item-id]");
+    let anchorEl: Element | null = null;
+    let anchorOffset = 0;
+    for (const card of cards) {
+      const rect = card.getBoundingClientRect();
+      if (rect.top >= -50) {
+        anchorEl = card;
+        anchorOffset = rect.top;
+        break;
+      }
+    }
+
+    setComplexity(newLevel);
+
+    // Double-rAF ensures the browser has completed a layout pass before we adjust
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (anchorEl) {
+          const newRect = anchorEl.getBoundingClientRect();
+          window.scrollBy(0, newRect.top - anchorOffset);
+        }
+      });
+    });
+  }
+
   const municipality = searchParams.get("municipality") ?? "all";
   const category = searchParams.get("category") ?? "all";
   const sort = searchParams.get("sort") ?? "recent";
@@ -115,8 +143,8 @@ export function FilterBar() {
               </button>
             ))}
           </div>
-          {/* Fade hint on right edge */}
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[var(--background)] to-transparent" />
+          {/* Fade hint on right edge — wider for visibility, color matches sticky bar bg */}
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[var(--background)]/95 to-transparent" />
         </div>
       </div>
 
@@ -128,7 +156,7 @@ export function FilterBar() {
             <button
               key={level.value}
               type="button"
-              onClick={() => setComplexity(level.value)}
+              onClick={() => handleComplexityChange(level.value)}
               aria-pressed={complexity === level.value}
               className={`rounded-md py-1 text-xs font-medium transition-all duration-150 ${
                 complexity === level.value

@@ -42,7 +42,7 @@ export function IssueGroupSection({ group }: { group: IssueGroup }) {
   const totalLetters = group.totalFeedbackCount;
 
   return (
-    <section id={group.bylawKey} className="scroll-mt-24 border-l-2 border-amber-400/60 pl-4 sm:pl-6">
+    <section id={group.bylawKey} data-item-id={group.bylawKey} className="scroll-mt-24 border-l-2 border-amber-400/60 pl-4 sm:pl-6">
       <header className="mb-4">
         {group.topicLabel ? (
           /* New: topic label as primary, bylaw/meta as a muted single row */

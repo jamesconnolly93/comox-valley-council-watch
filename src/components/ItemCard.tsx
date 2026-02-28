@@ -192,7 +192,11 @@ export function ItemCard({
 
   const displaySummary = getSummaryForComplexity(item, complexity);
   const impactText = isActionableImpact(item.impact) ? item.impact!.trim() : null;
-  const highImpact = !isThreadChild && isHighImpact(item.impact);
+  const highImpact =
+    !isThreadChild &&
+    (isHighImpact(item.impact) ||
+      (communitySignal?.participant_count != null && communitySignal.participant_count > 10) ||
+      feedbackCount > 0);
 
   // Collapsed subtitle: reading status (thread children) or impact snippet (regular)
   // Only used in Standard mode — Expert shows everything, Simple shows nothing
@@ -247,6 +251,7 @@ export function ItemCard({
     return (
       <article
         id={item.id}
+        data-item-id={item.id}
         className={`group relative scroll-mt-24 overflow-hidden rounded-xl bg-[var(--surface)] shadow-sm transition-shadow duration-200 hover:shadow-md ${borderClass}`}
       >
         <Link href={`/item/${item.id}`} className="flex min-w-0 items-center gap-2 px-4 py-2.5">
@@ -260,7 +265,8 @@ export function ItemCard({
           <div className="min-w-0 flex-1 overflow-hidden">
             {isThreadChild ? (
               item.headline?.trim() ? (
-                <span className="block truncate font-fraunces text-base font-semibold text-[var(--text-primary)]">
+                /* Simple: thread child with headline — lighter font than regular mode */
+                <span className="block truncate text-base font-medium text-[var(--text-primary)]">
                   {item.headline.trim()}
                 </span>
               ) : (
@@ -274,7 +280,8 @@ export function ItemCard({
                 </span>
               )
             ) : (
-              <span className="block truncate font-fraunces text-base font-semibold text-[var(--text-primary)]">
+              /* Simple: regular card headline — lighter font for scan mode */
+              <span className="block truncate text-base font-medium text-[var(--text-primary)]">
                 {displayTitle}
               </span>
             )}
@@ -290,6 +297,7 @@ export function ItemCard({
   return (
     <article
       id={item.id}
+      data-item-id={item.id}
       className={`group relative scroll-mt-24 overflow-hidden rounded-xl bg-[var(--surface)] shadow-sm transition-shadow duration-200 hover:shadow-md ${borderClass}${isExpert && isPlaceholder ? " opacity-50" : ""}`}
     >
       {/* Header — button only in Standard mode */}
@@ -353,8 +361,10 @@ export function ItemCard({
           {!isExpert && <ChevronIcon expanded={expanded} />}
         </div>
 
-        {/* Row 2: subtitle — Standard only (Expert shows everything in body) */}
-        {!isExpert && collapsedSubtitle && (
+        {/* Row 2: subtitle — Standard only.
+            Thread children: always show threadSubtitle (guaranteed non-null via "Details available" fallback).
+            Regular cards: show impact snippet only when available. */}
+        {!isExpert && (isThreadChild ? !!threadSubtitle : !!collapsedSubtitle) && (
           <div className="flex min-w-0 pl-0.5">
             <span
               className={`min-w-0 flex-1 truncate text-sm ${
@@ -363,7 +373,7 @@ export function ItemCard({
                   : "text-[var(--text-secondary)]"
               }`}
             >
-              {collapsedSubtitle}
+              {isThreadChild ? threadSubtitle : collapsedSubtitle}
             </span>
           </div>
         )}

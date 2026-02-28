@@ -84,7 +84,7 @@ export function MeetingGroup({ group }: { group: MeetingWithItems }) {
   }
 
   return (
-    <section>
+    <section data-item-id={`meeting-${meeting?.id ?? "unknown"}`}>
       {/* Lightweight date-divider style header */}
       <div className="mb-3 flex flex-wrap items-center gap-1.5 text-sm text-[var(--text-tertiary)]">
         {dateLabel && (

@@ -198,7 +198,7 @@ export default async function HomePage({
         </div>
       </header>
 
-      <main className="relative mx-auto max-w-4xl px-5 pt-6 pb-8 sm:px-6">
+      <main className="relative mx-auto max-w-4xl px-5 pt-3 pb-8 sm:px-6">
         <ComplexityProviderWrapper>
           <div className="space-y-6">
             {/* Sticky filter toolbar */}
