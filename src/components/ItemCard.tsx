@@ -10,6 +10,7 @@ import {
   isPlaceholderItem,
   municipalityBadgeClass,
   normaliseFeedback,
+  pluralize,
   deriveReadingStatus,
   formatMeetingDateMedium,
   cleanItemTitle,
@@ -145,14 +146,14 @@ function LettersIcon({ className }: { className?: string }) {
 function communitySignalBadgeLabel(signal: CommunitySignal): string {
   const n = signal.participant_count;
   switch (signal.type) {
-    case "letters": return n ? `${n} letters` : "Community letters";
-    case "survey": return n ? `${n} survey responses` : "Survey";
-    case "delegation": return n ? `${n} delegation${n === 1 ? "" : "s"}` : "Delegation";
-    case "petition": return n ? `${n} petition signatures` : "Petition";
+    case "letters":        return n ? pluralize(n, "letter") : "Community letters";
+    case "survey":         return n ? pluralize(n, "survey response") : "Survey";
+    case "delegation":     return n ? pluralize(n, "delegation") : "Delegation";
+    case "petition":       return n ? pluralize(n, "petition signature") : "Petition";
     case "public_hearing": return n ? `${n} at public hearing` : "Public hearing";
-    case "engagement": return n ? `${n} participants` : "Community engagement";
+    case "engagement":     return n ? pluralize(n, "participant") : "Community engagement";
     case "service_delivery": return n ? `${n.toLocaleString()} calls/events` : "Service data";
-    default: return n ? `${n} responses` : "Community input";
+    default:               return n ? pluralize(n, "response") : "Community input";
   }
 }
 
@@ -209,9 +210,15 @@ export function ItemCard({
   const threadSubtitle = isThreadChild
     ? (item.headline?.trim() || readingStatus || summarySnippet || "Details available")
     : null;
-  const collapsedSubtitle = !isExpert
-    ? (isThreadChild ? threadSubtitle : (impactText ? firstSentence(impactText) : null))
+  // Standard non-thread cards: impact snippet → summary preview (so every card has two lines)
+  const summaryPreview = !isThreadChild && !impactText && !isExpert
+    ? ((item.summary_simple || item.summary)?.slice(0, 100)?.trim() || null)
     : null;
+  const collapsedSubtitle = !isExpert
+    ? (isThreadChild ? threadSubtitle : (impactText ? firstSentence(impactText) : summaryPreview))
+    : null;
+  // Track whether Row 2 text is an impact line or a lighter summary preview
+  const isImpactSubtitle = !isThreadChild && !!impactText;
 
   // Thread child header: "Feb 18, 2026 — Regular Council Meeting"
   const rawMeetingTitle = item.meetings?.title ?? "";
@@ -323,13 +330,14 @@ export function ItemCard({
             </span>
           )}
 
-          <div className="min-w-0 flex-1 overflow-hidden">
+          {/* In Expert mode: allow headline to wrap fully (no truncation) */}
+          <div className={`min-w-0 flex-1 ${isExpert ? "" : "overflow-hidden"}`}>
             {isThreadChild ? (
               <span className="block truncate text-sm font-medium text-[var(--text-secondary)]">
                 {threadPrimaryLabel}
               </span>
             ) : (
-              <h3 className="truncate font-fraunces text-base font-semibold leading-snug text-[var(--text-primary)]">
+              <h3 className={`font-fraunces text-base font-semibold leading-snug text-[var(--text-primary)] ${isExpert ? "" : "truncate"}`}>
                 {displayTitle}
               </h3>
             )}
@@ -370,7 +378,9 @@ export function ItemCard({
               className={`min-w-0 flex-1 truncate text-sm ${
                 isThreadChild
                   ? "font-medium text-[var(--text-primary)]"
-                  : "text-[var(--text-secondary)]"
+                  : isImpactSubtitle
+                  ? "text-[var(--text-secondary)]"
+                  : "text-[var(--text-tertiary)]"
               }`}
             >
               {isThreadChild ? threadSubtitle : collapsedSubtitle}

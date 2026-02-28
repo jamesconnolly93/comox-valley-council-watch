@@ -8,6 +8,7 @@ import {
   normaliseFeedback,
   categoryLabel,
   extractBylawFromTitle,
+  pluralize,
 } from "@/lib/feed";
 import { useComplexity } from "@/lib/complexity-context";
 import { StructuredFindings } from "./StructuredFindings";
@@ -113,7 +114,7 @@ function CommunityBar({ feedback }: { feedback: NonNullable<ReturnType<typeof no
     <div className="mt-3 space-y-1.5">
       <div className="flex items-center gap-2">
         <span className="text-sm font-semibold text-[var(--text-primary)]">
-          {feedback.feedback_count} community letters
+          {pluralize(feedback.feedback_count, "community letter")}
         </span>
         {dominant && (
           <span className="text-xs text-[var(--text-tertiary)]">— {dominant}</span>
@@ -194,16 +195,22 @@ function LightweightSignal({ signal }: { signal: CommunitySignal }) {
       ) : signal.summary ? (
         <p className="text-sm text-[var(--text-secondary)]">
           <span className="font-medium text-[var(--text-primary)]">
-            {signal.participant_count ? `${signal.participant_count.toLocaleString()} ` : ""}
-            {signal.type === "survey"
-              ? "survey respondents"
+            {signal.participant_count != null
+              ? (() => {
+                  const n = signal.participant_count!;
+                  switch (signal.type) {
+                    case "survey": return pluralize(n, "survey respondent");
+                    case "delegation": return pluralize(n, "delegation");
+                    case "petition": return pluralize(n, "petition signature");
+                    case "service_delivery": return `${n.toLocaleString()} calls/events`;
+                    default: return pluralize(n, "participant");
+                  }
+                })()
+              : signal.type === "survey"
+              ? "Survey respondents"
               : signal.type === "delegation"
-              ? "delegations"
-              : signal.type === "petition"
-              ? "petition signatures"
-              : signal.type === "service_delivery"
-              ? "calls/events"
-              : "participants"}
+              ? "Delegations"
+              : "Participants"}
             :
           </span>{" "}
           {signal.summary}
@@ -279,7 +286,7 @@ function SpotlightStory({ item }: { item: FeedItem }) {
         {/* Compact community count */}
         {hasFeedback && feedback?.feedback_count ? (
           <p className="mt-1 text-xs text-[var(--text-tertiary)]">
-            {feedback.feedback_count} community letters
+            {pluralize(feedback.feedback_count, "community letter")}
           </p>
         ) : signal?.participant_count ? (
           <p className="mt-1 text-xs text-[var(--text-tertiary)]">

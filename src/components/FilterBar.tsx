@@ -20,14 +20,14 @@ export function FilterBar() {
 
   /** Change detail level while preserving the user's scroll position */
   function handleComplexityChange(newLevel: Complexity) {
-    // Capture the feed element closest to the top of the visible viewport
+    // Capture the element ID + offset before the state change
     const cards = document.querySelectorAll("[data-item-id]");
-    let anchorEl: Element | null = null;
+    let anchorId: string | null = null;
     let anchorOffset = 0;
     for (const card of cards) {
       const rect = card.getBoundingClientRect();
       if (rect.top >= -50) {
-        anchorEl = card;
+        anchorId = card.getAttribute("data-item-id");
         anchorOffset = rect.top;
         break;
       }
@@ -35,15 +35,20 @@ export function FilterBar() {
 
     setComplexity(newLevel);
 
-    // Double-rAF ensures the browser has completed a layout pass before we adjust
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        if (anchorEl) {
-          const newRect = anchorEl.getBoundingClientRect();
-          window.scrollBy(0, newRect.top - anchorOffset);
-        }
-      });
-    });
+    // Re-query by ID (not stale DOM reference) to handle React unmount/remount.
+    // Multiple attempts catch slow re-renders (meeting group collapse/expand).
+    const restore = () => {
+      if (!anchorId) return;
+      const el = document.querySelector(`[data-item-id="${anchorId}"]`);
+      if (el) {
+        const newRect = el.getBoundingClientRect();
+        window.scrollBy(0, newRect.top - anchorOffset);
+      }
+    };
+
+    requestAnimationFrame(() => requestAnimationFrame(restore));
+    setTimeout(restore, 100);
+    setTimeout(restore, 250);
   }
 
   const municipality = searchParams.get("municipality") ?? "all";

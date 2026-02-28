@@ -1,5 +1,9 @@
+"use client";
+
 import { ItemCard } from "./ItemCard";
 import type { IssueGroup } from "@/lib/feed";
+import { pluralize } from "@/lib/feed";
+import { useComplexity } from "@/lib/complexity-context";
 
 /** Number of whole months between two ISO date strings */
 function monthSpan(earliest: string, latest: string): number {
@@ -38,6 +42,8 @@ function LettersIcon({ className }: { className?: string }) {
 }
 
 export function IssueGroupSection({ group }: { group: IssueGroup }) {
+  const { complexity } = useComplexity();
+  const isExpert = complexity === "expert";
   const summary = threadSummaryLine(group);
   const totalLetters = group.totalFeedbackCount;
 
@@ -45,7 +51,7 @@ export function IssueGroupSection({ group }: { group: IssueGroup }) {
     <section id={group.bylawKey} data-item-id={group.bylawKey} className="scroll-mt-24 border-l-2 border-amber-400/60 pl-4 sm:pl-6">
       <header className="mb-4">
         {group.topicLabel ? (
-          /* New: topic label as primary, bylaw/meta as a muted single row */
+          /* topic label as primary, bylaw/meta as a muted single row */
           <>
             <h2 className="font-fraunces text-lg font-semibold text-[var(--text-primary)]">
               {group.topicLabel}
@@ -59,14 +65,14 @@ export function IssueGroupSection({ group }: { group: IssueGroup }) {
                   <span>·</span>
                   <span className="inline-flex items-center gap-0.5 text-amber-700">
                     <LettersIcon className="h-3 w-3" />
-                    {totalLetters} community letters
+                    {pluralize(totalLetters, "community letter")}
                   </span>
                 </>
               )}
             </div>
           </>
         ) : (
-          /* Fallback: original badge layout when topic_label not yet populated */
+          /* Fallback: badge layout when topic_label not yet populated */
           <>
             <div className="mb-1.5 flex flex-wrap items-center gap-2">
               <span className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
@@ -77,7 +83,7 @@ export function IssueGroupSection({ group }: { group: IssueGroup }) {
               {totalLetters > 0 && (
                 <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
                   <LettersIcon className="h-3 w-3" />
-                  {totalLetters} community letters
+                  {pluralize(totalLetters, "community letter")}
                 </span>
               )}
             </div>
@@ -88,7 +94,8 @@ export function IssueGroupSection({ group }: { group: IssueGroup }) {
         )}
       </header>
 
-      <div className="space-y-3">
+      {/* Expert mode: more breathing room between expanded cards */}
+      <div className={isExpert ? "space-y-6" : "space-y-3"}>
         {group.items.map((item) => (
           <ItemCard key={item.id} item={item} isThreadChild />
         ))}

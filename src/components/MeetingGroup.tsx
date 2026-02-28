@@ -100,7 +100,8 @@ export function MeetingGroup({ group }: { group: MeetingWithItems }) {
         <span>{itemLabel}</span>
       </div>
 
-      <div className="space-y-3">
+      {/* Expert mode: more breathing room between fully-expanded cards */}
+      <div className={isExpert ? "space-y-6" : "space-y-3"}>
         {visibleItems.map((item) => (
           <ItemCard
             key={item.id}
@@ -116,7 +117,7 @@ export function MeetingGroup({ group }: { group: MeetingWithItems }) {
         <button
           type="button"
           onClick={() => setShowAll((v) => !v)}
-          className="mt-3 text-sm text-[var(--text-tertiary)] transition-colors hover:text-[var(--text-secondary)]"
+          className="mt-3 rounded-md border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-1.5 text-sm text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--text-primary)]"
         >
           {showAll
             ? "Show fewer ▴"

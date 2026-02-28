@@ -157,6 +157,11 @@ export function isHighImpact(impact: string | null | undefined): boolean {
   );
 }
 
+/** Pluralize a count + noun: pluralize(1, 'letter') → '1 letter'; pluralize(3, 'letter') → '3 letters' */
+export function pluralize(count: number, singular: string, plural?: string): string {
+  return count === 1 ? `1 ${singular}` : `${count} ${plural ?? singular + "s"}`;
+}
+
 /** Items that appeared on the agenda but have no useful content */
 export function isPlaceholderItem(item: FeedItem): boolean {
   const markers = [
