@@ -33,7 +33,8 @@ Given a council meeting item, return ONLY a JSON object with no markdown formatt
   "decision": "What council decided, or null if not yet decided",
   "impact": "One punchy sentence starting with 'You' or 'Your' that tells a resident why this matters to them personally. Be specific with numbers when available. Examples: 'Your property taxes are going up ~7% this year.' 'New fees of $X per unit if you're building a home.' 'Your water bill may increase $29-33/year.' If the item doesn't directly affect residents, say so: 'No direct impact — this is an internal governance matter.'",
   "bylaw_number": "1234 or null",
-  "is_significant": true/false
+  "is_significant": true/false,
+  "contains_correspondence": true/false
 }
 
 Rules:
@@ -49,6 +50,7 @@ Rules:
   For participant_count: use the most prominent number (calls handled, respondents, letters received, events attended, etc.).
   IMPORTANT: err on the side of INCLUDING data. Only return null if the item is purely procedural with zero mention of any community interaction, public participation, or service delivery numbers.
 - positions: Capture 2-5 distinct findings, preferences, outcomes, or data points from the community participation or report. Think of these as the key takeaways a journalist would pull out. For surveys/engagement: what did people prefer, what were top concerns, what tradeoffs did they make? For service_delivery: what are the headline metrics? For letters/public_hearing: what were the main themes of support or opposition? Use "finding" stance for neutral data points, "support"/"oppose" for clear positions, "neutral" for mixed/unclear. Return [] if you cannot identify distinct findings.
+- contains_correspondence: true if this item includes or references public correspondence, letters, petitions, or written submissions from residents. Look for "RECEIVED LOG", "Public Input", "Written Submissions", sections with multiple letters from different people, or references to letters received. false otherwise.
 - For bylaw_number: extract just the numeric identifier (e.g. "3211" from "Bylaw No. 3211", "2025-15" from "Bylaw 2025-15"). Return null if no bylaw.
 
 Example for the Financial Plan Bylaw:
@@ -73,6 +75,22 @@ For tags, use 2-5 specific identifiers: place names, project names, policy names
 export function buildUserMessage(item) {
   const { title, description, decision } = item;
   return `Title: ${title || ""}\n\nContent: ${description || ""}\n\nDecision: ${decision ?? "None recorded"}`;
+}
+
+/**
+ * Build user message for PDF-based processing.
+ * The item title provides context; the PDF document block provides content.
+ */
+export function buildPdfUserMessage(item) {
+  const { title, decision } = item;
+  return `This PDF contains pages from a municipal council agenda. Focus on the item titled: "${title || ""}"
+
+The pages may include staff reports, bylaw text, maps, tables, charts, or correspondence.
+
+Analyze the full content of these PDF pages and return the JSON response as specified in your instructions.
+
+Item title: ${title || ""}
+${decision ? `Decision: ${decision}` : ""}`;
 }
 
 /**

@@ -55,8 +55,8 @@ export async function GET(req: NextRequest) {
     { name: "scrape:courtenay", file: "scrape-courtenay-highlights.mjs", timeoutMs: 30_000 },
     { name: "scrape:comox", file: "scrape-comox.mjs", timeoutMs: 60_000 },
     { name: "scrape:cumberland", file: "scrape-cumberland.mjs", timeoutMs: 60_000 },
-    { name: "process:ai", file: "process-ai-summaries.mjs", timeoutMs: 120_000 },
-    { name: "process:feedback", file: "process-feedback.mjs", timeoutMs: 60_000 },
+    { name: "process:items", file: "process-items.mjs", timeoutMs: 180_000 },
+    { name: "process:correspondence", file: "process-correspondence.mjs", timeoutMs: 120_000 },
   ];
 
   const results: Record<string, { ok: boolean; output: string }> = {};

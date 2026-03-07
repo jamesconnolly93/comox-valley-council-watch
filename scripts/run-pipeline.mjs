@@ -43,11 +43,11 @@ async function main() {
   console.error("\n=== Step 3b: Scraping Cumberland council meetings ===\n");
   await run(join(ROOT, "scripts", "scrape-cumberland.mjs"));
 
-  console.error("\n=== Step 4: Processing AI summaries ===\n");
-  await run(join(ROOT, "scripts", "process-ai-summaries.mjs"));
+  console.error("\n=== Step 4: Processing items (PDF vision + text fallback) ===\n");
+  await run(join(ROOT, "scripts", "process-items.mjs"));
 
-  console.error("\n=== Step 5: Processing public feedback (Community Voices) ===\n");
-  await run(join(ROOT, "scripts", "process-feedback.mjs"));
+  console.error("\n=== Step 5: Processing correspondence (Community Voices) ===\n");
+  await run(join(ROOT, "scripts", "process-correspondence.mjs"));
 
   console.error("\n=== Pipeline complete ===");
 }
